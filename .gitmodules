@@ -1,0 +1,12 @@
+[submodule "gpu-baselines/poa/GenomeWorks"]
+	path = gpu-baselines/poa/GenomeWorks
+	url = https://github.com/Yufeng98/GenomeWorks.git
+[submodule "gpu-baselines/bsw/GASAL2"]
+	path = gpu-baselines/bsw/GASAL2
+	url = https://github.com/Yufeng98/GASAL2.git
+[submodule "gpu-baselines/chain/minimap2-acceleration"]
+	path = gpu-baselines/chain/minimap2-acceleration
+	url = https://github.com/Yufeng98/minimap2-acceleration.git
+[submodule "gpu-baselines/phmm/PairHMM"]
+	path = gpu-baselines/phmm/PairHMM
+	url = https://github.com/Yufeng98/PairHMM.git
