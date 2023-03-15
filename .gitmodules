@@ -10,3 +10,6 @@
 [submodule "gpu-baselines/phmm/PairHMM"]
 	path = gpu-baselines/phmm/PairHMM
 	url = https://github.com/Yufeng98/PairHMM.git
+[submodule "cpu-baselines/phmm/GKL"]
+	path = cpu-baselines/phmm/GKL
+	url = https://github.com/Intel-HLS/GKL.git

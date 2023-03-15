@@ -1,0 +1,8 @@
+*.o
+*.a
+*.txt
+build-index-forward-only
+build-index-with-rev-complement
+bench-dp-chaining
+bench-smem
+bench-fixed-len-e2e-match

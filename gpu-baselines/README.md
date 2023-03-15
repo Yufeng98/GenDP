@@ -1,5 +1,3 @@
-##
-
 ### System Requirements
 
 1. gcc >= 8.3.1
