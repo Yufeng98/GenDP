@@ -13,7 +13,7 @@ cd gpu-baselines/bsw/GASAL2
 wget https://genomicsbench.eecs.umich.edu/bsw_147_1m_8bit_input.txt
 python3 process_bsw_input.py bsw_147_1m_8bit_input.txt
 ./configure.sh ${CUDA_PATH}    # E.g., /usr/local/cuda
-make GPU_SM_ARCH=${ARCH_CODE} MAX_QUERY_LEN=132 N_CODE=0x4E -j    # E.g. GPU_SM_ARCH=sm_80
+make GPU_SM_ARCH=${ARCH_CODE} MAX_QUERY_LEN=132 N_CODE=0x4E    # E.g. GPU_SM_ARCH=sm_80
 cd test_prog
 make -j
 ./test_prog.out -k 100 -y ksw ../bsw_seqs.fasta ../bsw_refs.fasta
