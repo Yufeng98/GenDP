@@ -13,3 +13,6 @@
 [submodule "cpu-baselines/phmm/GKL"]
 	path = cpu-baselines/phmm/GKL
 	url = https://github.com/Intel-HLS/GKL.git
+[submodule "cpu-baselines/poa/racon"]
+	path = cpu-baselines/poa/racon
+	url = https://github.com/Yufeng98/racon.git

@@ -18,7 +18,7 @@ source /opt/intel/oneapi/setvars.sh
 ```bash
 # Use sse4.1 as the default SIMD flag, could also choose avx2 or avx512
 # Check SIMD compatibility with `lscpu | grep Flags`, e.g., sse, avx2, avx512
-cd cpu-baselines/bsw/ && make -j16 CXX=icpc arch=${SIMD_FLAG}
+cd cpu-baselines/bsw/ && make -j CXX=icpc arch=${SIMD_FLAG}
 wget https://genomicsbench.eecs.umich.edu/bsw_147_1m_8bit_input.txt
 ./bsw -pairs bsw_147_1m_8bit_input.txt -t ${NUM_THREADS} -b 512
 ```
@@ -28,7 +28,7 @@ wget https://genomicsbench.eecs.umich.edu/bsw_147_1m_8bit_input.txt
 # cd cpu-baselines/phmm/GKL && ./gradlew test
 # Optionally build GKL library libgkl_pairhmm_c.so from source code
 # We provide the pre-built GKL library
-cd cpu-baselines/phmm && make -j16 CXX=icpc arch=${SIMD_FLAG}
+cd cpu-baselines/phmm && make -j CXX=icpc arch=${SIMD_FLAG}
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
 wget https://genomicsbench.eecs.umich.edu/large.in
 ./phmm -f large.in -t ${NUM_THREADS}
@@ -36,7 +36,7 @@ wget https://genomicsbench.eecs.umich.edu/large.in
 
 #### Chain
 ```bash
-cd cpu-baselines/chain/Trans-Omics-Acceleration-Library && make -j16 CXX=icpc arch=${SIMD_FLAG}
+cd cpu-baselines/chain/Trans-Omics-Acceleration-Library && make -j CXX=icpc arch=${SIMD_FLAG}
 wget https://genomicsbench.eecs.umich.edu/bsw_147_1m_8bit_input.txt
 ./bench-dp-chaining chain_in-10k.txt ${NUM_THREADS}
 ```
@@ -44,29 +44,10 @@ wget https://genomicsbench.eecs.umich.edu/bsw_147_1m_8bit_input.txt
 ## POA
 ### Compilation
 ```bash
-cd poa/racon-poa && mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release .. && make -j16
-
-cd ./poa/spoa && mkdir build && cd build
-~/cmake-3.22.0-linux-x86_64/bin/cmake -DCMAKE_BUILD_TYPE=Release -DZLIB_INCLUDE_DIR=~/zlib-1.2.11 -DZLIB_LIBRARY=~/zlib-1.2.11/libz.so ..
-scl enable devtoolset-9 bash
-cd ../../ && make -j16 arch=avx512
-
-```
-### Run
-```bash
-./racon -t 56 guppy_hac.fastq saureus.flye.mm2.sam saureus.fasta > saureus.racon.fasta
-./build/bin/racon -t 80 -g -6 ~/input_data/poa-racon/guppy_hac.fastq ~/input_data/poa-racon/saureus.flye.mm2.sam ~/input_data/poa-racon/saureus.fasta > saureus.racon.fasta
-numactl -N 0 -m 0 build/bin/racon -t 28 -g -6 /x/arunsub/input-datasets/poa/guppy_hac.fastq /x/arunsub/input-datasets/poa/saureus.flye.mm2.sam /x/arunsub/input-datasets/poa/saureus.fasta > saureus.racon.fasta
-# ./poa -s ~/input_data/poa_input.fasta -t 56
-# ./poa -s /x/arunsub/input-datasets/poa/large/input.fasta -t 56
-
-```
-### Notes
-
-Download inputs:
-```bash
+cd cpu-baselines/poa/racon && mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
 wget https://genomicsbench.eecs.umich.edu/guppy_hac.fastq
 wget https://genomicsbench.eecs.umich.edu/saureus.flye.mm2.sam
 wget https://genomicsbench.eecs.umich.edu/saureus.fasta
+./bin/racon -t ${NUM_THREADS} -g -6 guppy_hac.fastq saureus.flye.mm2.sam saureus.fasta > saureus.racon.fasta
 ```
