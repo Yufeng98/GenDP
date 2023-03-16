@@ -2,7 +2,7 @@
 
 1. gcc >= 8.3.1
 2. cmake >= 3.16.0
-3. CUDA 10.0+
+3. CUDA >= 10.0
 
 ### GPU Baselines
 
@@ -43,7 +43,8 @@ wget https://genomicsbench.eecs.umich.edu/large.in
 
 ```bash
 cd poa/GenomeWorks
-mkdir build && cd build
+mkdir build
+cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -Dgw_cuda_gen_all_arch=OFF -DCUDA_TOOLKIT_ROOT_DIR=${CUDA_PATH}
 make -j cudapoa-bin
 cd cudapoa

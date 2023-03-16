@@ -299,6 +299,6 @@ int main(int argc, char** argv) {
         _mm_free(batches[i].results);
     }
     _mm_free(testcases);
-    printf("\nPairHMM completed. Kernel runtime: %.2f sec. NumCellsComputed: %ld\n", runtime*1e-6, numCells);
+    printf("\nPairHMM completed. Kernel runtime: %.4f sec. NumCellsComputed: %ld\n", runtime*1e-6, numCells);
 
 }

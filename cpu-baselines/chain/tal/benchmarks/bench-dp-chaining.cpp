@@ -152,5 +152,5 @@ int main(int argc, char* argv[]){
 		double freq = __rdtsc() - tim;
 	
 		fprintf(stderr, "Processor freq: %0.2lf MHz\n", freq/1e6);
-		fprintf(stderr, "Total ticks = %lld, %0.2lf s\n", total_ticks, total_ticks * 1.0 / freq);
+		fprintf(stderr, "Total ticks = %lld, %0.4lf s\n", total_ticks, total_ticks * 1.0 / freq);
 }

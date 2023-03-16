@@ -328,8 +328,8 @@ int main(int argc, char *argv[])
     printf("Processor freq: %0.2lf MHz\n", freq/1e6);
 
     //int64_t myTicks = bsw->getTicks();
-    printf("Read time = %0.2lf s\n", readTim/freq);
-    printf("Overall SW cycles = %ld, %0.2lf s\n", totalTicks, totalTicks * 1.0 / freq);
+    printf("Read time = %0.4lf s\n", readTim/freq);
+    printf("Overall SW cycles = %ld, %0.4lf s\n", totalTicks, totalTicks * 1.0 / freq);
     printf("Total Pairs processed: %d\n", numPairs);
     
     int64_t sumTicks = 0;
