@@ -1,3 +1,5 @@
+## CPU Baselines
+
 ### System Requirements
 
 1. gcc >= 8.3.1
@@ -15,7 +17,7 @@ sudo sh ./l_HPCKit_p_2023.0.0.25400_offline.sh
 source /opt/intel/oneapi/setvars.sh
 ```
 
-#### BSW
+### BSW
 ```bash
 # Use sse4.1 as the default SIMD flag, could also choose avx2 or avx512
 # Check SIMD compatibility with `lscpu | grep Flags`, e.g., sse, avx2, avx512
@@ -25,7 +27,7 @@ wget https://genomicsbench.eecs.umich.edu/bsw_147_1m_8bit_input.txt
 ./bsw -pairs bsw_147_1m_8bit_input.txt -t ${NUM_THREADS} -b 512
 ```
 
-#### Chain
+### Chain
 ```bash
 cd cpu-baselines/chain/tal
 make -j CXX=icpc arch=${SIMD_FLAG}
@@ -33,7 +35,7 @@ wget https://genomicsbench.eecs.umich.edu/chain_in-10k.txt
 ./bench-dp-chaining chain_in-10k.txt ${NUM_THREADS}
 ```
 
-#### PariHMM
+### PariHMM
 ```bash
 # cd cpu-baselines/phmm/GKL\n./gradlew test
 # Optionally build GKL library libgkl_pairhmm_c.so from source code
@@ -45,8 +47,7 @@ wget https://genomicsbench.eecs.umich.edu/large.in
 ./phmm -f large.in -t ${NUM_THREADS}
 ```
 
-## POA
-### Compilation
+### POA
 ```bash
 cd cpu-baselines/poa/racon
 mkdir build

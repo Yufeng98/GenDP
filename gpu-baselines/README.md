@@ -1,12 +1,12 @@
+## GPU Baselines
+
 ### System Requirements
 
 1. gcc >= 8.3.1
 2. cmake >= 3.16.0
 3. CUDA >= 10.0
 
-### GPU Baselines
-
-#### BSW
+### BSW
 ```bash
 cd gpu-baselines/bsw/GASAL2
 # Preprocessing input datasets
@@ -19,7 +19,7 @@ make -j
 ./test_prog.out -k 100 -y ksw ../bsw_seqs.fasta ../bsw_refs.fasta
 ```
 
-#### Chain
+### Chain
 ```bash
 export PATH=${CUDA_BINARY_PATH}:$PATH   # E.g., /usr/local/cuda/bin
 cd gpu-baselines/chain/minimap2-acceleration/kernel/cuda
@@ -30,7 +30,7 @@ wget https://genomicsbench.eecs.umich.edu/in-10k.txt
 USE_HOST_KERNEL=1 in-10k.txt out-10k-gpu.txt    
 ```
 
-#### PairHMM
+### PairHMM
 ```bash
 cd gpu-baselines/phmm/PairHMM
 make GPU=1 GPU_SM_ARCH=${ARCH_CODE} CUDA_PATH=${CUDA_PATH} -j
@@ -39,7 +39,7 @@ wget https://genomicsbench.eecs.umich.edu/large.in
 ./pairhmm large.in > large.gpu.out
 ```
 
-#### POA
+## POA
 
 ```bash
 cd poa/GenomeWorks
