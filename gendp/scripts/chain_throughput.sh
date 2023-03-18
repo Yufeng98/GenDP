@@ -1,11 +1,11 @@
 #!/bin/bash
 
 python3 scripts/chain_instruction_generator.py
-make clean && make -j16
+make clean && make -j
 cp sim sim_chain
 
-# ./sim_chain -k 4 -i /z/scratch7/yufenggu/input-datasets/chain/small/in-1k.txt > chain_sim_result/chain_sim_result-1k.txt
-./sim_chain -k 4 -i /z/scratch7/yufenggu/input-datasets/chain/large/c_elegans_40x.10k.in > chain_sim_result/chain_sim_result-10k.txt
+./sim_chain -k 4 -i datasets/large/c_elegans_40x.10k.in -n $1 > chain_sim_results/chain_sim_result-10k.txt
+# ./sim_chain -k 4 -i datasets/large/in-1k.txt > chain_sim_results/chain_sim_result-1k.txt
 
 # ./sim_chain -k 4 -i /z/scratch7/yufenggu/input-datasets/chain/small/in-1k.txt -o chain_tmp.txt -s
 # R 229459104 W 76477016

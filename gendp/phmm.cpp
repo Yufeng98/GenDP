@@ -6,11 +6,11 @@
 int phmm_read_input(phmm *phmm_input, std::string phmm_input_file, unsigned long phmm_compute_instruction[][COMP_INSTR_BUFFER_GROUP_SIZE], unsigned long phmm_main_instruction[][CTRL_INSTR_BUFFER_GROUP_SIZE], unsigned long phmm_pe_instruction[][CTRL_INSTR_BUFFER_NUM][CTRL_INSTR_BUFFER_GROUP_SIZE]) {
 
     int i;
-    std::string phmm_compute_instruction_file = "../data/phmm/compute_instruction.txt";
-    std::string phmm_main_instruction_file = "../data/phmm/main_instruction.txt";
+    std::string phmm_compute_instruction_file = "instructions/phmm/compute_instruction.txt";
+    std::string phmm_main_instruction_file = "instructions/phmm/main_instruction.txt";
     std::string phmm_pe_instruction_file[PHMM_PE_GROUP_SIZE];
     for (i=0; i<PHMM_PE_GROUP_SIZE; i++)
-        phmm_pe_instruction_file[i] = "../data/phmm/pe_" + std::to_string(i) + "_instruction.txt";
+        phmm_pe_instruction_file[i] = "instructions/phmm/pe_" + std::to_string(i) + "_instruction.txt";
     int phmm_input_index = -1, read_index = 0, read_begin = 0;
     std::string line;
     std::fstream fp_phmm_input, fp_phmm_compute_instruction, fp_phmm_main_instruction, fp_phmm_pe_instruction[PHMM_PE_GROUP_SIZE];
@@ -169,7 +169,7 @@ void phmm_simulate(pe_array *pe_array_unit, phmm* phmm_input, int n, FILE* fp, i
 
 }
 
-void phmm_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output) {
+void phmm_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output, int simulation_cases) {
 
     int i, j;
     pe_array *pe_array_unit = new pe_array(1024, 1024);
@@ -215,12 +215,20 @@ void phmm_simulation(char *inputFileName, char *outputFileName, FILE *fp, int sh
     int* phmm_output;
     int index = 0;
     phmm_output = (int*)malloc(phmm_input_num * sizeof(int));
-    // phmm_simulate(pe_array_unit, phmm_input[0], 1000000, fp, show_output);
-    for (i = 0; i <= phmm_input_num; i++) {
-    // for (i = 0; i < 3; i++)
-        phmm_simulate(pe_array_unit, phmm_input+i, 10000000, fp, show_output, phmm_output+index);
-        index++;
+
+    printf("Start simulation.\n");
+    if (simulation_cases < 0 || simulation_cases >= phmm_input_num) {
+        for (i = 0; i <= phmm_input_num; i++) {
+            phmm_simulate(pe_array_unit, phmm_input+i, 10000000, fp, show_output, phmm_output+index);
+            index++;
+        }
+    } else {
+        for (i = 0; i <= simulation_cases; i++) {
+            phmm_simulate(pe_array_unit, phmm_input+i, 10000000, fp, show_output, phmm_output+index);
+            index++;
+        }
     }
+        
     
     if (show_output) fclose(fp);
     free(phmm_output);

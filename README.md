@@ -20,3 +20,7 @@ The table below shows the GPU system configuration and the runtime(second) for e
 | NVIDIA RTX A100   | 11.2 |  |  |    |   |
 | NVIDIA RTX A6000  | 12.0 | 0.012 | 0.339 | 0.572   | 3.70  |
 | TITAN Xp          | 10.2 | 0.020 | 0.747 | 0.915   | 11.17 |
+
+### Instructions
+
+See compilation and execution instructions for GenDP simulation and CPU/GPU baselines under each folder.

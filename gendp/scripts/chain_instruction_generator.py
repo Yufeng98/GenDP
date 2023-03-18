@@ -73,7 +73,7 @@ def data_movement_instruction(dest, src, reg_immBar_0, reg_auto_increase_0, imm_
     
 def chain_compute():
     
-    f = open("../data/chain/compute_instruction.txt", "w")
+    f = open("instructions/chain/compute_instruction.txt", "w")
     
     f.write(compute_instruction(1, 15, 9, 11, 13, 0, 0, 0, 0, 7))       # 0 ri-11 qi-12 rj-13 qj-14
     f.write(compute_instruction(1, 15, 9, 12, 14, 0, 0, 0, 0, 8))
@@ -117,7 +117,7 @@ def chain_compute():
 # dest, src, flag_0, flag_1, imm/reg_0, reg_0(++), flag_2, flag_3, imm/reg_1, reg_1(++), opcode
 def chain_main_instruction():
     
-    f = open("../data/chain/main_instruction.txt", "w")
+    f = open("instructions/chain/main_instruction.txt", "w")
     
     f.write(data_movement_instruction(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, none))                                  # No-op
     f.write(data_movement_instruction(gr, 0, 0, 0, 1, 0, 0, 0, 64, 0, si))                                  # gr[1] = pe_group_size
@@ -195,7 +195,7 @@ def chain_main_instruction():
 
 def pe_instruction(i):
     
-    f = open("../data/chain/pe_{}_instruction.txt".format(i), "w")
+    f = open("instructions/chain/pe_{}_instruction.txt".format(i), "w")
 
     f.write(data_movement_instruction(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, halt))                                  # halt
     f.write(data_movement_instruction(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, halt))                                  # halt

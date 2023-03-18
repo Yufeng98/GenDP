@@ -1,2 +1,9 @@
 build/
 gendp/datasets/large
+sim*
+*sim_results
+*_output
+*_correctness
+*_instruction.txt
+*.o
+*.a

@@ -43,6 +43,6 @@ call_t read_call(FILE *fp);
 
 std::vector<call_t> chain_read_input(std::string chain_input_file, unsigned long chain_compute_instruction[][COMP_INSTR_BUFFER_GROUP_SIZE], unsigned long chain_main_instruction[], unsigned long chain_pe_instruction[][CTRL_INSTR_BUFFER_NUM][CTRL_INSTR_BUFFER_GROUP_SIZE]);
 void chain_simulate(pe_array *pe_array_unit, call_t chain_input, int n, FILE* fp, int show_output, int* output);
-void chain_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output);
+void chain_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output, int simulation_cases);
 
 #endif

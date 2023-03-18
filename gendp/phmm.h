@@ -18,6 +18,6 @@ typedef struct phmm_input {
 
 int phmm_read_input(phmm *phmm_input, std::string phmm_input_file, unsigned long phmm_compute_instruction[][COMP_INSTR_BUFFER_GROUP_SIZE], unsigned long phmm_main_instruction[], unsigned long phmm_pe_instruction[][CTRL_INSTR_BUFFER_NUM][CTRL_INSTR_BUFFER_GROUP_SIZE]);
 void phmm_simulate(pe_array *pe_array_unit, phmm phmm_input, int n, FILE* fp, int show_output, int* output);
-void phmm_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output);
+void phmm_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output, int simulation_cases);
 
 #endif

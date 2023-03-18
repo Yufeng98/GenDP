@@ -25,6 +25,6 @@ typedef struct poa_input {
 int poa_read_input(poa *poa_input, std::string poa_input_file, unsigned long poa_compute_instruction[][COMP_INSTR_BUFFER_GROUP_SIZE], unsigned long poa_main_instruction[], unsigned long poa_pe_instruction[][CTRL_INSTR_BUFFER_NUM][CTRL_INSTR_BUFFER_GROUP_SIZE]);
 void poa_simulate(pe_array *pe_array_unit, poa poa_input, int n, FILE* fp, int show_output, int* output);
 void poa_print_input(poa poa_input);
-void poa_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output);
+void poa_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output, int simulation_cases);
 
 #endif

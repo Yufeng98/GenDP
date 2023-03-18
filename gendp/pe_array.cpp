@@ -201,7 +201,7 @@ void pe_array::store(int dest_pos, int reg_immBar_flag, int rs1, int rs2, int da
     }
 }
 
-int pe_array::decode(unsigned long instruction, int* PC, int simd, int setting) {
+int pe_array::decode(unsigned long instruction, int* PC, int simd, int setting, int main_instruction_setting) {
 
 #ifdef PROFILE
     // printf("main j=%d\t", main_addressing_register[12]);
@@ -260,15 +260,23 @@ int pe_array::decode(unsigned long instruction, int* PC, int simd, int setting) 
 #ifdef PROFILE
     printf("PC = %d\t", *PC);
 #endif
-    if (setting == MAIN_INSTRUCTION_2)
-        if (setting == MAIN_INSTRUCTION_2)
-            if (((opcode == 4 || opcode == 5) && (dest == 5 || dest == 6 || dest == 11 || dest == 12 || dest == 13 || dest == 14)) || opcode == 14) {
-                (*PC)++;
+    if (main_instruction_setting == MAIN_INSTRUCTION_2) {
+        if (((opcode == 4 || opcode == 5) && (dest == 5 || dest == 6 || dest == 11 || dest == 12 || dest == 13 || dest == 14)) || opcode == 14) {
+            (*PC)++;
 #ifdef PROFILE
             printf("\n");
 #endif
-                return 0;
-            }
+            return 0;
+        }
+    } else if (main_instruction_setting == MAIN_INSTRUCTION_1) {
+        if (dest == 5 || dest == 6 || dest == 11 || dest == 12 || dest == 13 || dest == 14) {
+            (*PC)++;
+#ifdef PROFILE
+            printf("\n");
+#endif
+            return 0;
+        }
+    }
 
 #ifdef DEBUG
     printf("dest: %d src: %d reg_immBar_flag_0: %d reg_auto_increasement_flag_0: %d reg_imm_0_sign_bit: %d sext_imm_0: %d, reg_0: %d reg_immBar_flag_1: %d reg_auto_increasement_flag_1: %d reg_imm_1_sign_bit: %d sext_imm_1: %d reg_1: %d opcode: %d\n", dest, src, reg_immBar_flag_0, reg_auto_increasement_flag_0, reg_imm_0_sign_bit, sext_imm_0, reg_0, reg_immBar_flag_1, reg_auto_increasement_flag_1, reg_imm_1_sign_bit, sext_imm_1, reg_1, opcode);
@@ -490,7 +498,7 @@ int pe_array::decode(unsigned long instruction, int* PC, int simd, int setting) 
     return 0;
 }
 
-int pe_array::decode_output(unsigned long instruction, int* PC, int simd, int setting) {
+int pe_array::decode_output(unsigned long instruction, int* PC, int simd, int setting, int main_instruction_setting) {
 
 #ifdef PROFILE
     printf("main\t");
@@ -531,11 +539,20 @@ int pe_array::decode_output(unsigned long instruction, int* PC, int simd, int se
 #ifdef PROFILE
     printf("PC = %d\t", *PC);
 #endif
-    if (((opcode == 4 || opcode == 5) && (dest != 5 && dest != 6 && dest != 11 && dest != 12 && dest != 13 && dest != 14)) || opcode == 14) {
+    if (main_instruction_setting == MAIN_INSTRUCTION_2) {
+        if (((opcode == 4 || opcode == 5) && (dest != 5 && dest != 6 && dest != 11 && dest != 12 && dest != 13 && dest != 14)) || opcode == 14) {
 #ifdef PROFILE
-        printf("\n");
+            printf("\n");
 #endif
-        return 0;
+            return 0;
+        }
+    } else if (main_instruction_setting == MAIN_INSTRUCTION_1) {
+        if (dest != 5 && dest != 6 && dest != 11 && dest != 12 && dest != 13 && dest != 14) {
+#ifdef PROFILE
+            printf("\n");
+#endif
+            return 0;
+        }
     }
 
 #ifdef DEBUG
@@ -711,7 +728,7 @@ void pe_array::run(int cycle_limit, int simd, int setting, int main_instruction_
     while (1) {
         cycle++;
         old_PC = main_PC;
-        flag = decode(main_instruction_buffer[main_PC][1], &main_PC, simd, setting);
+        flag = decode(main_instruction_buffer[main_PC][1], &main_PC, simd, setting, main_instruction_setting);
         pe_unit[0]->load_data = store_data;
         pe_unit[0]->load_instruction[0] = PE_instruction[0];
         pe_unit[0]->load_instruction[1] = PE_instruction[1];
@@ -756,8 +773,10 @@ void pe_array::run(int cycle_limit, int simd, int setting, int main_instruction_
         }
         from_fifo = 0;
         
-        if (main_instruction_setting == MAIN_INSTRUCTION_2)
-            decode_output(main_instruction_buffer[old_PC][0], &old_PC, simd, setting);
+        if (main_instruction_setting == MAIN_INSTRUCTION_1)
+            decode_output(main_instruction_buffer[old_PC][1], &old_PC, simd, setting, main_instruction_setting);
+        else if (main_instruction_setting == MAIN_INSTRUCTION_2)
+            decode_output(main_instruction_buffer[old_PC][0], &old_PC, simd, setting, main_instruction_setting);
 
         main_addressing_register[13] = pe_unit[0]->get_gr_10() && pe_unit[1]->get_gr_10();
         for (i = 2; i < setting; i++)

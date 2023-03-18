@@ -58,11 +58,11 @@ call_t read_call(FILE *fp, long long* dram_load_size, long long* dram_store_size
 std::vector<call_t> chain_read_input(std::string chain_input_file, unsigned long chain_compute_instruction[][COMP_INSTR_BUFFER_GROUP_SIZE], unsigned long chain_main_instruction[][CTRL_INSTR_BUFFER_GROUP_SIZE], unsigned long chain_pe_instruction[][CTRL_INSTR_BUFFER_NUM][CTRL_INSTR_BUFFER_GROUP_SIZE]) {
 
     int i;
-    std::string chain_compute_instruction_file = "../data/chain/compute_instruction.txt";
-    std::string chain_main_instruction_file = "../data/chain/main_instruction.txt";
+    std::string chain_compute_instruction_file = "instructions/chain/compute_instruction.txt";
+    std::string chain_main_instruction_file = "instructions/chain/main_instruction.txt";
     std::string chain_pe_instruction_file[CHAIN_PE_GROUP_SIZE];
     for (i=0; i<CHAIN_PE_GROUP_SIZE; i++)
-        chain_pe_instruction_file[i] = "../data/chain/pe_" + std::to_string(i) + "_instruction.txt";
+        chain_pe_instruction_file[i] = "instructions/chain/pe_" + std::to_string(i) + "_instruction.txt";
     int read_index = 0;
     std::string line;
     std::fstream fp_chain_input, fp_chain_compute_instruction, fp_chain_main_instruction, fp_chain_pe_instruction[CHAIN_PE_GROUP_SIZE];
@@ -167,14 +167,14 @@ void chain_simulate(pe_array *pe_array_unit, call_t_array* chain_input, int n, F
         pe_array_unit->input_buffer_write_from_ddr(i*3+2+8, &q_span);
     }
 
-    // printf("%d ", chain_input->n);
+    printf("Cells %d\n", chain_input->n * 64);
     pe_array_unit->run(n, simd, PE_64_SETTING, MAIN_INSTRUCTION_2);
 
     if (show_output) pe_array_unit->chain_show_output_buffer(chain_input->n, fp);
 
 }
 
-void chain_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output) {
+void chain_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output, int simulation_cases) {
 
     int i, j;
     pe_array *pe_array_unit = new pe_array(20480 * 100, 20480 * 100);
@@ -239,10 +239,17 @@ void chain_simulation(char *inputFileName, char *outputFileName, FILE *fp, int s
     chain_output = (int*)malloc(total_len * sizeof(int));
 
     // chain_simulate(pe_array_unit, calls[0], 1000000, fp, show_output);
-    for (i = 0; i < (int)calls.size(); i++) {
-    // for (i = 0; i < 3; i++)
-        chain_simulate(pe_array_unit, calls_array+i, 10000000, fp, show_output, chain_output + index);
-        index += calls[i].n;
+
+    if (simulation_cases < 0 || simulation_cases > (int)calls.size()) {
+        for (i = 0; i < (int)calls.size(); i++) {
+            chain_simulate(pe_array_unit, calls_array+i, 10000000, fp, show_output, chain_output + index);
+            index += calls[i].n;
+        }
+    } else {
+        for (i = 0; i < simulation_cases; i++) {
+            chain_simulate(pe_array_unit, calls_array+i, 10000000, fp, show_output, chain_output + index);
+            index += calls[i].n;
+        }
     }
     
     if (show_output) fclose(fp);

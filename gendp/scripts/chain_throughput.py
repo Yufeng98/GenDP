@@ -10,12 +10,13 @@ cycle = 0
 reads = 0
 
 for line in lines:
-    lst = line.split()
-    cells += 64 * int(lst[0])
-    cycle += int(lst[2])
+    if line[:5] == "cycle":
+        cycle += int(line.split()[-1])
+    elif line[:5] == "Cells":
+        cells += 64 * int(line.split()[-1])
     reads += 1
 
-area_scaling_factor_7nm = 4.5 * 1.7
+area_scaling_factor_7nm = 7.8
 time = cycle/(1024*1024*1024)
 freq = 2
 area = 5.4

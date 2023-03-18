@@ -5,13 +5,13 @@
 int poa_read_input(poa *poa_input, std::string poa_input_file, unsigned long poa_compute_instruction[][COMP_INSTR_BUFFER_GROUP_SIZE], unsigned long poa_main_instruction[], unsigned long poa_pe_instruction[][CTRL_INSTR_BUFFER_NUM][CTRL_INSTR_BUFFER_GROUP_SIZE]) {
 
     int i;
-    std::string poa_compute_instruction_file = "../data/poa/compute_instruction.txt";
-    std::string poa_main_instruction_file = "../data/poa/main_instruction.txt";
+    std::string poa_compute_instruction_file = "instructions/poa/compute_instruction.txt";
+    std::string poa_main_instruction_file = "instructions/poa/main_instruction.txt";
     std::string poa_pe_instruction_file[POA_PE_GROUP_SIZE];
-    poa_pe_instruction_file[0] = "../data/poa/pe_0_instruction.txt";
-    poa_pe_instruction_file[1] = "../data/poa/pe_1_instruction.txt";
-    poa_pe_instruction_file[2] = "../data/poa/pe_2_instruction.txt";
-    poa_pe_instruction_file[3] = "../data/poa/pe_3_instruction.txt";
+    poa_pe_instruction_file[0] = "instructions/poa/pe_0_instruction.txt";
+    poa_pe_instruction_file[1] = "instructions/poa/pe_1_instruction.txt";
+    poa_pe_instruction_file[2] = "instructions/poa/pe_2_instruction.txt";
+    poa_pe_instruction_file[3] = "instructions/poa/pe_3_instruction.txt";
     int poa_input_index = -1, read_index = 0, pred_num_begin = 0, pred_pos_begin = 0, seq_y_begin = 0, seq_x_begin = 0;
     std::string line;
     std::fstream fp_poa_input, fp_poa_compute_instruction, fp_poa_main_instruction, fp_poa_pe_instruction[POA_PE_GROUP_SIZE];
@@ -219,12 +219,12 @@ void poa_simulate(pe_array *pe_array_unit, poa poa_input, int n, FILE* fp, int s
 
 
     pe_array_unit->run(n, simd, PE_4_SETTING, MAIN_INSTRUCTION_1);
-    // printf("len_y %d len_x %d\n", poa_input.len_y_unpadding, poa_input.len_x - 3);
+    printf("len_y %d len_x %d\n", poa_input.len_y_unpadding, poa_input.len_x - 3);
 
     if (show_output) pe_array_unit->poa_show_output_buffer(poa_input.len_y, poa_input.len_x, fp);
 }
 
-void poa_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output) {
+void poa_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output, int simulation_cases) {
 
     int i, j;
     pe_array *pe_array_unit = new pe_array(16384, 400 * 1024 * 1024);
@@ -280,9 +280,17 @@ void poa_simulation(char *inputFileName, char *outputFileName, FILE *fp, int sho
 
 
     // poa_simulate(pe_array_unit, poa_input[8], 60000, fp, show_output);
-    for (i = 0; i < poa_input_index; i++) {
-        poa_simulate(pe_array_unit, poa_input[i], 100000000, fp, show_output, poa_output+index);
-        index += poa_input[i].len_x * poa_input[i].len_y *2;
+
+    if (simulation_cases < 0 || simulation_cases >= poa_input_index) {
+        for (i = 0; i < poa_input_index; i++) {
+            poa_simulate(pe_array_unit, poa_input[i], 100000000, fp, show_output, poa_output+index);
+            index += poa_input[i].len_x * poa_input[i].len_y *2;
+        }
+    } else {
+        for (i = 0; i < simulation_cases; i++) {
+            poa_simulate(pe_array_unit, poa_input[i], 100000000, fp, show_output, poa_output+index);
+            index += poa_input[i].len_x * poa_input[i].len_y *2;
+        }
     }
     
     if (show_output) fclose(fp);

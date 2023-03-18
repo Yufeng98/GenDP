@@ -43,7 +43,7 @@ void bsw_read_input(bsw* bsw_input, SeqPair* seqPairArray, int8_t* seqBufQer, in
 
 void bsw_simulate(pe_array *pe_array_unit, bsw bsw_input, int n, FILE* fp, int show_output, int* output);
 
-void bsw_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output);
+void bsw_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output, int simulation_cases);
 
 unsigned int load_constant(int8_t constant);
 

@@ -1,40 +1,48 @@
 #!/bin/bash
 
 python3 scripts/poa_instruction_generator.py
-make clean && make $1 -j16
+make clean && make -j
 cp sim sim_poa_throughput
 
-# ./sim_poa_throughput -k 3 -i /x/yufenggu/input-data/poa_input/input_1 -o poa_tmp.txt -s > /x/yufenggu/input-data/poa_sim_result_dram/poa_sim_result_1.txt
+num_thread_group=3
+num_threads=5
 
-for i in {0..49}
+for i in {0..2}
 do
-    ./sim_poa_throughput -k 3 -i /x/yufenggu/input-data/poa_input/input_$((i*4+1)) > poa_sim_result/sim_result_$((i*4+1)).txt &
-    P1=$!
-    ./sim_poa_throughput -k 3 -i /x/yufenggu/input-data/poa_input/input_$((i*4+2)) > poa_sim_result/sim_result_$((i*4+2)).txt &
-    P2=$!
-    ./sim_poa_throughput -k 3 -i /x/yufenggu/input-data/poa_input/input_$((i*4+3)) > poa_sim_result/sim_result_$((i*4+3)).txt &
-    P3=$!
-    ./sim_poa_throughput -k 3 -i /x/yufenggu/input-data/poa_input/input_$((i*4+4)) > poa_sim_result/sim_result_$((i*4+4)).txt &
-    P4=$!
-    # ./sim_poa_throughput -k 3 -i /x/yufenggu/input-data/poa_input/input_${i} -o poa_tmp.txt -s >> tmp
-    # python3 scripts/expand_memory_trace.py /x/yufenggu/input-data/poa_sim_result_dram/poa_sim_result_${i}.txt 32 > /x/yufenggu/input-data/poa_sim_result_dram/poa_sim_result_${i}.trace
-    # python3 scripts/calculate_memory_bandwidth.py /x/yufenggu/input-data/poa_sim_result_dram/poa_sim_result_${i}.txt ../../ramulator/poa/poa_${i}_channel_8_rank_1.txt 32
-    wait $P1 $P2 $P3 $P4
+  ./sim_poa_throughput -k 3 -i datasets/large/poa_input/input_$((i*num_threads+1)) -o poa_output/output_$((i*num_threads+1)) -s > poa_sim_results/sim_result_$((i*num_threads+1)).txt &
+  P1=$!
+  ./sim_poa_throughput -k 3 -i datasets/large/poa_input/input_$((i*num_threads+2)) -o poa_output/output_$((i*num_threads+2)) -s > poa_sim_results/sim_result_$((i*num_threads+2)).txt &
+  P2=$!
+  ./sim_poa_throughput -k 3 -i datasets/large/poa_input/input_$((i*num_threads+3)) -o poa_output/output_$((i*num_threads+3)) -s > poa_sim_results/sim_result_$((i*num_threads+3)).txt &
+  P3=$!
+  ./sim_poa_throughput -k 3 -i datasets/large/poa_input/input_$((i*num_threads+4)) -o poa_output/output_$((i*num_threads+4)) -s > poa_sim_results/sim_result_$((i*num_threads+4)).txt &
+  P4=$!
+  ./sim_poa_throughput -k 3 -i datasets/large/poa_input/input_$((i*num_threads+5)) -o poa_output/output_$((i*num_threads+5)) -s > poa_sim_results/sim_result_$((i*num_threads+5)).txt &
+  P5=$!
+  wait $P1 $P2 $P3 $P4 $P5
 done
 
-# for i in {6201..6216}
-# do
-#     ./sim_poa_throughput -k 3 -i /x/yufenggu/input-data/poa_input/input_${i} > poa_sim_result/sim_result_${i}.txt &
-# done
+./sim_poa_throughput -k 3 -i datasets/large/poa_input/input_16 > poa_sim_results/sim_result_16.txt &
+  P1=$!
+wait $P1
 
-# 1097656402 315037380879
-# 1097656 315037380 reduce 1000x to save time and space
+for i in {0..2}
+do
+  python3 scripts/poa_check_correctness.py poa_output/output_$((i*num_threads+1)) /x/yufenggu/input-data/poa_output/output_$((i*num_threads+1)) 0 > poa_correctness/poa_$((i*num_threads+1)).txt &
+  P1=$!
+  python3 scripts/poa_check_correctness.py poa_output/output_$((i*num_threads+2)) /x/yufenggu/input-data/poa_output/output_$((i*num_threads+2)) 0 > poa_correctness/poa_$((i*num_threads+2)).txt &
+  P2=$!
+  python3 scripts/poa_check_correctness.py poa_output/output_$((i*num_threads+3)) /x/yufenggu/input-data/poa_output/output_$((i*num_threads+3)) 0 > poa_correctness/poa_$((i*num_threads+3)).txt &
+  P3=$!
+  python3 scripts/poa_check_correctness.py poa_output/output_$((i*num_threads+4)) /x/yufenggu/input-data/poa_output/output_$((i*num_threads+4)) 0 > poa_correctness/poa_$((i*num_threads+4)).txt &
+  P4=$!
+  python3 scripts/poa_check_correctness.py poa_output/output_$((i*num_threads+5)) /x/yufenggu/input-data/poa_output/output_$((i*num_threads+5)) 0 > poa_correctness/poa_$((i*num_threads+5)).txt &
+  P5=$!
+  wait $P1 $P2 $P3 $P4 $P5
+done
 
-# cp tmp poa_dram_read_write_cycle
-# python3 ../generator.py poa_dram_read_write_cycle
-# python3 scripts/expand_memory_trace.py /x/yufenggu/input-data/poa_sim_result_dram/poa_sim_result.trace 1097656 315037380
+python3 scripts/poa_check_correctness.py poa_output/output_$((i*num_threads+1)) /x/yufenggu/input-data/poa_output/output_$((i*num_threads+1)) 0 > poa_correctness/poa_$((i*num_threads+1)).txt &
+  P1=$!
+wait $P1
 
-
-
-
-wait
+python3 scripts/poa_throughput.py poa_sim_results poa_correctness 16

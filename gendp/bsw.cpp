@@ -223,7 +223,7 @@ void bsw_simulate(pe_array *pe_array_unit, bsw* bsw_input, int n, FILE* fp, int 
 
 }
 
-void bsw_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output) {
+void bsw_simulation(char *inputFileName, char *outputFileName, FILE *fp, int show_output, int simulation_cases) {
 
     pe_array *pe_array_unit = new pe_array(1024, 1024);
 
@@ -280,13 +280,13 @@ void bsw_simulation(char *inputFileName, char *outputFileName, FILE *fp, int sho
         bsw_main_instruction[i] = -1;
     }
 
-    std::string bsw_compute_instruction_file = "../data/bsw/compute_instruction.txt";
-    std::string bsw_main_instruction_file = "../data/bsw/main_instruction.txt";
+    std::string bsw_compute_instruction_file = "instructions/bsw/compute_instruction.txt";
+    std::string bsw_main_instruction_file = "instructions/bsw/main_instruction.txt";
     std::string bsw_pe_instruction_file[BSW_PE_GROUP_SIZE];
-    bsw_pe_instruction_file[0] = "../data/bsw/pe_0_instruction.txt";
-    bsw_pe_instruction_file[1] = "../data/bsw/pe_1_instruction.txt";
-    bsw_pe_instruction_file[2] = "../data/bsw/pe_2_instruction.txt";
-    bsw_pe_instruction_file[3] = "../data/bsw/pe_3_instruction.txt";
+    bsw_pe_instruction_file[0] = "instructions/bsw/pe_0_instruction.txt";
+    bsw_pe_instruction_file[1] = "instructions/bsw/pe_1_instruction.txt";
+    bsw_pe_instruction_file[2] = "instructions/bsw/pe_2_instruction.txt";
+    bsw_pe_instruction_file[3] = "instructions/bsw/pe_3_instruction.txt";
     std::fstream fp_bsw_input, fp_bsw_compute_instruction, fp_bsw_main_instruction, fp_bsw_pe_instruction[BSW_PE_GROUP_SIZE];
     std::string line;
     int read_index = 0;
@@ -353,11 +353,18 @@ void bsw_simulation(char *inputFileName, char *outputFileName, FILE *fp, int sho
     int index = 0;
     bsw_output = (int*)malloc(6*roundNumPairs/SIMD_WIDTH8*sizeof(int));
 
-    for (i = 0; i < roundNumPairs/SIMD_WIDTH8; i++) {
-    // for (i = 0; i < 10; i++)
-        bsw_simulate(pe_array_unit, bsw_input+i, 100000, fp, show_output, bsw_output + index);
-        index += 6;
+    if (simulation_cases < 0 || simulation_cases >= roundNumPairs/SIMD_WIDTH8) {
+        for (i = 0; i < roundNumPairs/SIMD_WIDTH8; i++) {
+            bsw_simulate(pe_array_unit, bsw_input+i, 100000, fp, show_output, bsw_output + index);
+            index += 6;
+        }
+    } else {
+        for (i = 0; i < simulation_cases; i++) {
+            bsw_simulate(pe_array_unit, bsw_input+i, 100000, fp, show_output, bsw_output + index);
+            index += 6;
+        }
     }
+    
 
     if (show_output) fclose(fp);
     free(bsw_output);

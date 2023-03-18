@@ -38,8 +38,8 @@ class pe_array {
 
         void buffer_reset(int* buffer, int num);
 
-        int decode(unsigned long instruction, int* PC, int simd, int setting);
-        int decode_output(unsigned long instruction, int* PC, int simd, int setting);
+        int decode(unsigned long instruction, int* PC, int simd, int setting, int main_instruction_setting);
+        int decode_output(unsigned long instruction, int* PC, int simd, int setting, int main_instruction_setting);
 
         int load(int source_pos, int reg_immBar_flag, int rs1, int rs2, int simd);
         void store(int dest_pos, int reg_immBar_flag, int rs1, int rs2, int data, int simd);
