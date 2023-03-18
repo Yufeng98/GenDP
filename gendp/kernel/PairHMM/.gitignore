@@ -1,0 +1,12 @@
+*.pdf
+*.aux
+*.log
+*.swp
+*.o
+pairhmm
+other/
+tmp*
+*.out
+*.txt
+test_data
+doc

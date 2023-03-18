@@ -1,4 +1,11 @@
 import sys
+import os
+
+if not os.path.exists("datasets/poa/input"):
+    os.makedirs("datasets/poa/input")
+if not os.path.exists("datasets/poa/output"):
+    os.makedirs("datasets/poa/output")
+
 file_name = sys.argv[1]
 folder = sys.argv[2]
 
@@ -22,12 +29,6 @@ for line in lines:
             num_seq[seq_count] = 1
         else:
             num_seq[seq_count] += 1
-        if seq_count > 201:
-            print(file_num, end=" ")
         seq_count = 0
 f.close()
-# print(num_seq)
-# for key in num_seq.keys():
-#     if num_seq[key] > 100:
-#         print(key, num_seq[key])
-print(file_num)
+print("Generate", file_num, "POA input filts.")
