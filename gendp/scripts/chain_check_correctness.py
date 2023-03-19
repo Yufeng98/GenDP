@@ -11,12 +11,15 @@ n = min(len(lines), len(lines_1))
 err = {}
 err_sum = 0
 for i in range(n):
-    if lines[i] != lines_1[i]:
+    score = int(lines[i])
+    score_1 = int(lines_1[i])
+    if abs(score - score_1) > 1:
+        print(i, lines[i][:-1], lines_1[i][:-1])
         e = int(lines[i])-int(lines_1[i])
         err_sum += 1
         if e not in err.keys():
             err[e] = 1
         else:
             err[e] += 1
-print(err_sum, n, "{:.6f}".format(err_sum/n))
+print(err_sum, "errors out of", n, "scores.")
 # print(err)

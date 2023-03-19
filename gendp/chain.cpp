@@ -130,7 +130,7 @@ std::vector<call_t> chain_read_input(std::string chain_input_file, unsigned long
     return calls;
 }
 
-void chain_simulate(pe_array *pe_array_unit, call_t_array* chain_input, int n, FILE* fp, int show_output, int* output) {
+void chain_simulate(pe_array *pe_array_unit, call_t chain_input, int n, FILE* fp, int show_output, int* output) {
 
     int i;
     int simd = 0;
@@ -141,7 +141,7 @@ void chain_simulate(pe_array *pe_array_unit, call_t_array* chain_input, int n, F
     for (i = 0; i < FIFO_GROUP_SIZE; i++) pe_array_unit->fifo_unit[0][i].clear();
 
     // Load data from input file to input buffer
-    int chain_n = chain_input->n;
+    int chain_n = chain_input.n;
     int const_1 = CHAIN_CONSTANT_1;
     int const_16 = CHAIN_CONSTANT_16;
     int const_min = CHAIN_CONSTANT_MIN;
@@ -149,28 +149,28 @@ void chain_simulate(pe_array *pe_array_unit, call_t_array* chain_input, int n, F
     pe_array_unit->input_buffer_write_from_ddr(1, &const_1);
     pe_array_unit->input_buffer_write_from_ddr(2, &const_16);
     pe_array_unit->input_buffer_write_from_ddr(3, &const_min);
-    pe_array_unit->input_buffer_write_from_ddr(4, &chain_input->max_dist_y);
-    pe_array_unit->input_buffer_write_from_ddr(5, &chain_input->bw);
-    int avg_qspan_tmp = round(chain_input->avg_qspan * 0.01 * (1<<16));		// constant
+    pe_array_unit->input_buffer_write_from_ddr(4, &chain_input.max_dist_y);
+    pe_array_unit->input_buffer_write_from_ddr(5, &chain_input.bw);
+    int avg_qspan_tmp = round(chain_input.avg_qspan * 0.01 * (1<<16));		// constant
 	unsigned int fractional_mask = (1 << 16) -1;	
 	unsigned int integer_mask    = ~fractional_mask;
     unsigned int tmp_0 = integer_mask & avg_qspan_tmp;
     unsigned int tmp_1 = fractional_mask & avg_qspan_tmp;
     pe_array_unit->input_buffer_write_from_ddr_unsigned(6, &tmp_0);
     pe_array_unit->input_buffer_write_from_ddr_unsigned(7, &tmp_1);
-    for (i = 0; i < chain_input->n; i++) {
-        int32_t tmp_2 = (int32_t)chain_input->anchors[i].x;
-        int32_t tmp_3 = (int32_t)chain_input->anchors[i].y;
+    for (i = 0; i < (int)chain_input.n; i++) {
+        int32_t tmp_2 = (int32_t)chain_input.anchors[i].x;
+        int32_t tmp_3 = (int32_t)chain_input.anchors[i].y;
         pe_array_unit->input_buffer_write_from_ddr(i*3+8, &tmp_2);
         pe_array_unit->input_buffer_write_from_ddr(i*3+1+8, &tmp_3);
-        int32_t q_span = (int32_t)(chain_input->anchors[i].y>>32 & 0xff);
+        int32_t q_span = (int32_t)(chain_input.anchors[i].y>>32 & 0xff);
         pe_array_unit->input_buffer_write_from_ddr(i*3+2+8, &q_span);
     }
 
-    printf("Cells %d\n", chain_input->n * 64);
+    printf("Cells %d\n", chain_input.n * 64);
     pe_array_unit->run(n, simd, PE_64_SETTING, MAIN_INSTRUCTION_2);
 
-    if (show_output) pe_array_unit->chain_show_output_buffer(chain_input->n, fp);
+    if (show_output) pe_array_unit->chain_show_output_buffer(chain_input.n, fp);
 
 }
 
@@ -200,22 +200,6 @@ void chain_simulation(char *inputFileName, char *outputFileName, FILE *fp, int s
 
     fprintf(stderr, "read input %s\n", inputFileName);
     std::vector<call_t> calls = chain_read_input(inputFileName, chain_compute_instruction, chain_main_instruction, chain_pe_instruction);
-    call_t_array *calls_array;
-    calls_array = (call_t_array*)malloc((int)calls.size()*sizeof(call_t_array));
-    for (i = 0; i < (int)calls.size(); i++) {
-        calls_array[i].n = calls[i].n;
-        calls_array[i].avg_qspan = calls[i].avg_qspan;
-        calls_array[i].max_dist_x = calls[i].max_dist_x;
-        calls_array[i].bw = calls[i].bw;
-        calls_array[i].n_segs = calls[i].n_segs;
-        calls_array[i].anchors = (anchor_t*)malloc(calls_array[i].n * sizeof(anchor_t));
-        for (j = 0; j < (int)calls[i].anchors.size(); j++){
-            calls_array[i].anchors[j].x = calls[i].anchors[j].x;
-            calls_array[i].anchors[j].y = calls[i].anchors[j].y;
-            calls_array[i].q_span = calls[i].anchors[j].y>>32 & 0xff;
-        }
-    }
-
 
     // Load data from input file to instruction buffer
     for (i = 0; i < CHAIN_COMPUTE_INSTRUCTION_NUM; i++) {
@@ -242,12 +226,12 @@ void chain_simulation(char *inputFileName, char *outputFileName, FILE *fp, int s
 
     if (simulation_cases < 0 || simulation_cases > (int)calls.size()) {
         for (i = 0; i < (int)calls.size(); i++) {
-            chain_simulate(pe_array_unit, calls_array+i, 10000000, fp, show_output, chain_output + index);
+            chain_simulate(pe_array_unit, calls[i], 10000000, fp, show_output, chain_output + index);
             index += calls[i].n;
         }
     } else {
         for (i = 0; i < simulation_cases; i++) {
-            chain_simulate(pe_array_unit, calls_array+i, 10000000, fp, show_output, chain_output + index);
+            chain_simulate(pe_array_unit, calls[i], 10000000, fp, show_output, chain_output + index);
             index += calls[i].n;
         }
     }
@@ -256,8 +240,5 @@ void chain_simulation(char *inputFileName, char *outputFileName, FILE *fp, int s
     free(chain_output);
 
 
-    for (i = 0; i < (int)calls.size(); i++)
-        free(calls_array[i].anchors);
-    free(calls_array);
     delete pe_array_unit;
 }

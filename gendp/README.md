@@ -33,10 +33,10 @@ bash scripts/bsw_throughput.sh -1
 ```bash
 cd kernel/chain
 make -j print=1
-./chain -i ../../datasets/c_elegans_40x.10k.in -o ../../datasets/chain_output.txt -n 100
+./chain -i ../../datasets/c_elegans_40x.10k.in -o ../../datasets/chain_output.txt -s 4 -n 100
 # bash scripts/chaim_throughput.sh <dataset input size>
 mkdir -p chain_sim_results
-bash scripts/chaim_throughput.sh 100
+bash scripts/chain_throughput.sh 100
 ```
 
 ### PairHMM

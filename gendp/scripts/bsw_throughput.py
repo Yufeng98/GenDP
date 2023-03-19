@@ -58,9 +58,12 @@ f_correctness = open(file_correctness, "r")
 lines_correctness = f_correctness.readlines()
 if not len(lines_correctness) > 1:
     print("Simulation results verified.")
+else:
+    print("Simulation results failed.")
+    print(lines_correctness)
 
 print("Throughput in {}GHz {:.3f} MCUPS/mm2".format(freq, 16*cells * freq / time / (1024*1024) / area * area_scaling_factor_7nm))
-print("Throughput in {}GHz {:.3f} KReads/mm2".format(freq, 16*reads * freq / 1024 / time / area * area_scaling_factor_7nm))
-print("Cycle", cycle)
-print("Cells", cells)
-print("Reads", reads)
+# print("Throughput in {}GHz {:.3f} KReads/mm2".format(freq, 16*reads * freq / 1024 / time / area * area_scaling_factor_7nm))
+# print("Cycle", cycle)
+# print("Cells", cells)
+# print("Reads", reads)

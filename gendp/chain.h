@@ -29,14 +29,6 @@ struct call_t {
     std::vector<anchor_t> anchors;
 };
 
-struct call_t_array {
-    anchor_idx_t n;
-    float avg_qspan;
-    int max_dist_x, max_dist_y, bw, n_segs;
-    anchor_t* anchors;
-    int q_span, tmp_0, tmp_1;
-};
-
 void skip_to_EOR(FILE *fp);
 
 call_t read_call(FILE *fp);
