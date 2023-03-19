@@ -55,7 +55,7 @@ LDFLAGS = -L.
 # Space-separated pkg-config libraries used by this project
 LIBS = -ldl -lsim
 # LIBS = -L../tools/minimap2 -lminimap2
-SIMULATOR_PATH=../../simulator
+SIMULATOR_PATH=../../
 
 
 ifneq ($(VTUNE_HOME),)

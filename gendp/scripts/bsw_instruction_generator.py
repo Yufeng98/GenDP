@@ -1,4 +1,5 @@
 import sys
+import os
 
 reg = 0
 gr = 1
@@ -1037,7 +1038,10 @@ def pe_3_instruction():
     f.write(data_movement_instruction(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, halt))                                  # halt
 
     f.close()
- 
+
+
+if not os.path.exists("instructions/bsw"):
+    os.makedirs("instructions/bsw")
 bsw_compute()
 bsw_main_instruction()
 pe_0_instruction()

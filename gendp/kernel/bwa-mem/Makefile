@@ -2,7 +2,7 @@ CXX=g++
 AR=ar rc
 CXXFLAGS=-g -Wall -Wextra -O3 -fopenmp -Wno-unused-parameter -Wno-unused-variable
 CXXFLAGS+= -std=c++11
-SIMULATOR_PATH=../../simulator
+SIMULATOR_PATH=../../
 INCLUDES= -I$(SIMULATOR_PATH)
 LIBS=
 CXXFLAGS+= $(INCLUDES)

@@ -1,4 +1,5 @@
 import sys
+import os
 
 reg = 0
 gr = 1
@@ -450,7 +451,8 @@ def pe_instruction(i):
            
     f.close()
 
-
+if not os.path.exists("instructions/chain"):
+    os.makedirs("instructions/chain")
 chain_compute()
 chain_main_instruction()
 for i in range(64):

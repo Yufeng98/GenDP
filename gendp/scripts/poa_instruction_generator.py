@@ -1,4 +1,5 @@
 import sys
+import os
 
 reg = 0
 gr = 1
@@ -949,7 +950,11 @@ def pe_3_instruction():
     f.write(data_movement_instruction(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, halt))                                  # halt
     
     f.close()
- 
+
+
+if not os.path.exists("instructions/poa"):
+    os.makedirs("instructions/poa")
+    
 poa_compute()
 poa_main_instruction()
 pe_0_instruction()

@@ -1,8 +1,8 @@
 import sys
 
-file_name = sys.argv[1]
+file_name_sim_result = sys.argv[1]
 
-f = open(file_name, "r")
+f = open(file_name_sim_result, "r")
 lines = f.readlines()
 simd = {}
 simd["<10%"] = 0
@@ -53,11 +53,14 @@ freq = 2
 area = 5.4
 area_scaling_factor_7nm = 7.8
 
-print("throughput in {}GHz {:.3f} MCUPS/mm2".format(freq, 16*cells * freq / time / (1024*1024) / area * area_scaling_factor_7nm))
-print("throughput in {}GHz {:.3f} KReads/mm2".format(freq, 16*reads * freq / 1024 / time / area * area_scaling_factor_7nm))
-print("cycle", cycle)
-print("cells", cells)
-print("reads", reads)
-print("simd utilization")
-for key in simd.keys():
-    print(key, ",{:.2f}%,".format(simd[key]/reads*4*100))
+file_correctness = sys.argv[2]
+f_correctness = open(file_correctness, "r")
+lines_correctness = f_correctness.readlines()
+if not len(lines_correctness) > 1:
+    print("Simulation results verified.")
+
+print("Throughput in {}GHz {:.3f} MCUPS/mm2".format(freq, 16*cells * freq / time / (1024*1024) / area * area_scaling_factor_7nm))
+print("Throughput in {}GHz {:.3f} KReads/mm2".format(freq, 16*reads * freq / 1024 / time / area * area_scaling_factor_7nm))
+print("Cycle", cycle)
+print("Cells", cells)
+print("Reads", reads)

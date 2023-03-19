@@ -16,9 +16,9 @@ for line in lines_sim:
     sim.append(line.split())
 
 for line in lines_kernel:
-    kernel.append(line.split())
+    kernel.append(line.split(","))
 
-for i in range(len(sim)):
+for i in range(min(len(sim), len(kernel))):
     if sim[i] != kernel[i]:
         flag = 0
         for j in index:

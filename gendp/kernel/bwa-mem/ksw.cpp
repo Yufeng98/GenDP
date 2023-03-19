@@ -43,6 +43,8 @@
 #endif
 
 #define CLMUL 8
+#define SIMD 8
+#define PARALLEL_LINE 12
 
 #undef MAX_SEQ_LEN_REF
 #define MAX_SEQ_LEN_REF 2048
@@ -587,6 +589,167 @@ int ksw_extend2(int qlen, const uint8_t *query, int tlen, const uint8_t *target,
 	return max;
 }
 
+int max_func(int* a, int n) {
+	int m = 0, i;
+	for (i=0; i<n; i++) {
+		if (a[i] > m) m = a[i];
+	}
+	return m;
+}
+
+int ksw_extend2_test_gendp(int qlen, const uint8_t *query, int tlen, const uint8_t *target, int m, const int8_t *mat, int o_del, int e_del, int o_ins, int e_ins, int w, int end_bonus, int zdrop, int h0, int *_qle, int *_tle, int *_gtle, int *_gscore, int *_max_off, int64_t* numCellsComputed, int print_score)
+{
+	eh_t *eh; // score array
+	int8_t *qp; // query profile
+	int i, j, k, oe_del = o_del + e_del, oe_ins = o_ins + e_ins, beg, end, max, max_i, max_j, max_ins, max_del, max_ie, gscore, max_off;
+	// if(h0 <= 0) printf("%d", h0);
+	// else assert(h0 > 0);
+	assert(h0 > 0);
+	// allocate memory
+	qp = (int8_t*)malloc(qlen * m);
+	eh = (eh_t*)calloc(qlen + 1, 8);	// store the value in the last row
+	// generate the query profile
+	for (k = i = 0; k < m; ++k) {
+		const int8_t *p = &mat[k * m];
+		for (j = 0; j < qlen; ++j) {
+			qp[i++] = p[query[j]];
+			// printf("%d ", p[query[j]]);
+		}
+		// printf("\n");
+	}
+
+	// fill the last row
+	eh[0].h = h0; eh[1].h = h0 > oe_ins? h0 - oe_ins : 0;
+	for (j = 2; j <= qlen && eh[j-1].h > e_ins; ++j)
+		eh[j].h = eh[j-1].h - e_ins;
+	// adjust $w if it is too large
+	k = m * m;
+	for (i = 0, max = 0; i < k; ++i) // get the max score: 1
+		max = max > mat[i]? max : mat[i];
+	max_ins = (int)((double)(qlen * max + end_bonus - o_ins) / e_ins + 1.);
+	max_ins = max_ins > 1? max_ins : 1;
+	w = w < max_ins? w : max_ins;
+	max_del = (int)((double)(qlen * max + end_bonus - o_del) / e_del + 1.);
+	max_del = max_del > 1? max_del : 1;
+	w = w < max_del? w : max_del; // TODO: is this necessary?
+	// if (w > 100) printf("%d ", qlen);
+	// DP loop
+	max = h0, max_i = max_j = -1; max_ie = -1, gscore = -1;
+	max_off = 0;
+	beg = 0, end = qlen;
+	int *cells, *array;
+	cells = (int*)malloc(sizeof(int) * tlen);
+
+	// struct timeval start_time, end_time;
+    // gettimeofday(&start_time, NULL);
+	for (i = 0; i < tlen; ++i) {
+		int t, f = 0, h1, m = 0, mj = -1;
+		int8_t *q = &qp[target[i] * qlen];
+		// apply the band and the constraint (if provided)
+		if (beg < i - w) beg = i - w;
+		if (end > i + w + 1) end = i + w + 1;
+		if (end > qlen) end = qlen;
+		// compute the first column
+		if (beg == 0) {
+			h1 = h0 - (o_del + e_del * (i + 1));
+			if (h1 < 0) h1 = 0;
+		} else h1 = 0;
+		cells[i] = end-beg;
+		if (i%PARALLEL_LINE == 0 && i > 0) {
+			array = (int*)malloc(sizeof(int) * PARALLEL_LINE);
+			for (k=0;k<PARALLEL_LINE;k++) array[k] = cells[i-PARALLEL_LINE+k];
+			(*numCellsComputed) += (max_func(array, PARALLEL_LINE) + 3) * PARALLEL_LINE;
+			free(array);
+		}
+		if (i == tlen-1) {
+			int z;
+			z = (tlen-1)%PARALLEL_LINE;
+			array = (int*)malloc(sizeof(int) * (z+1));
+			for (k=0;k<(z+1);k++) array[k] = cells[i-z+k];
+			(*numCellsComputed) += (max_func(array, (z+1)) + z) * (z+1);
+			free(array);
+		}
+		// printf("%d %d %d\n", w, beg, end);
+		for (j = beg; j < end; ++j) {
+			// At the beginning of the loop: eh[j] = { H(i-1,j-1), E(i-1,j) }, f = F(i,j-1) and h1 = H(i,j-1)
+			// Similar to SSE2-SW, cells are computed in the following order:
+			//   H(i,j)   = max{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)}
+			//   E(i+1,j) = max{H(i,j)-gapoe, E(i,j)} - gape
+			//   F(i,j+1) = max{H(i,j)-gapoe, F(i,j)} - gape
+			eh_t *p = &eh[j];
+			int h, M = p->h, e = p->e; // get H(i-1,j-1) and E(i-1,j)
+			if (print_score) printf("%d ", M);
+			p->h = h1;          // save H(i,j-1) for the next row
+			M = M? M + q[j] : 0;// H(i-1,j-1)+S(i,j)
+			if (print_score) printf("%d ", M);
+			h = M > e? M : e;   // e and f are guaranteed to be non-negative, so h>=0 even if M<0
+			h = h > f? h : f;	// h = max(M, e, f)
+			mj = m > h? mj : j; // record the position where max score is achieved
+			m = m > h? m : h;   // m is stored at eh[mj+1]
+			t = M - oe_del;
+			t = t > 0? t : 0;
+			e -= e_del;
+			e = e > t? e : t;   // computed E(i+1,j)
+			// t = M - oe_ins;
+			// t = t > 0? t : 0;
+			f -= e_ins;
+			f = f > t? f : t;   // computed F(i,j+1)
+			h1 = h;             // save H(i,j) to h1 for the next column
+			p->e = e;           // save E(i+1,j) for the next row
+			// if (print_score) printf("%ld %d %d %d\n", *numCellsComputed, h, e, f);
+			if (print_score) printf("%d %d %d\n", h, e, f);
+		}
+
+		if (print_score) printf("\n");
+		eh[end].h = h1; eh[end].e = 0;
+		if (j == qlen) {
+			max_ie = gscore > h1? max_ie : i;
+			gscore = gscore > h1? gscore : h1;
+			// printf("%d %d\n", i, gscore);
+		}
+		if (m == 0) {
+			// printf("break\n");
+			break;
+		}
+		if (m > max) {
+			max = m, max_i = i, max_j = mj;
+			max_off = max_off > abs(mj - i)? max_off : abs(mj - i);
+		} 
+		else if (zdrop > 0) {
+			if (i - max_i > mj - max_j) {
+				if (max - m - ((i - max_i) - (mj - max_j)) * e_del > zdrop) {printf("ZDROP\n"); break;}
+			} else {
+				if (max - m - ((mj - max_j) - (i - max_i)) * e_ins > zdrop) {printf("ZDROP\n"); break;}
+			}
+		}
+		// update beg and end for the next round
+		for (j = beg; j < end && eh[j].h == 0 && eh[j].e == 0; ++j);
+		beg = j;
+		for (j = end; j >= beg && eh[j].h == 0 && eh[j].e == 0; --j);
+		end = j + 2 < qlen? j + 2 : qlen;
+		// beg = 0; end = qlen; // uncomment this line for debugging
+	}
+	free(cells);
+	// printf("\n");
+	// printf("%ld\n", (*numCellsComputed));
+
+	// gettimeofday(&end_time, NULL);
+    // *runtime += (end_time.tv_sec - start_time.tv_sec) * 1e6 + (end_time.tv_usec - start_time.tv_usec);
+	free(eh); free(qp);
+	// printf("%ld\n", *numCellsComputed);
+	// printf("Qlen:%d,Rlen:%d,ScalarNumCellsComputed:%lld\n", qlen, tlen, numCellsComputed);
+
+	if (_qle) *_qle = max_j + 1;
+	if (_tle) *_tle = max_i + 1;
+	if (_gtle) *_gtle = max_ie + 1;
+	if (_gscore) *_gscore = gscore;
+	if (_max_off) *_max_off = max_off;
+
+	// printf("%d %d %d %d %d\n", max_j, max_i, max_ie, gscore, max_off);
+	// printf("%d %d %d %d %d\n", *_qle, *_tle, *_gtle, *_gscore, *_max_off);
+	return max;
+}
+
 void help() {
     printf("\n"
         "usage: ./chain [options ...]\n"
@@ -626,32 +789,30 @@ int main(int argc, char *argv[])
     FILE* fp_in, *fp_out;
 
 	char *inputFileName = 0, *outputFileName = 0;
-	int serial = 0, parallel = 0, print_score = 0, num_lines = 1000, pe_group = 4, accelerator_kernel = 0;
+	int output = 0, parallel = 0, print_score = 0, num_lines = 2000000, pe_group = 4, setting = 0, input_size = 0;
 
     char opt;
 	int numThreads = 1;
-    while ((opt = getopt(argc, argv, "i:o:t:n:g:hspka")) != -1) {
+    while ((opt = getopt(argc, argv, "i:o:t:n:g:s:hxpk")) != -1) {
         switch (opt) {
             case 'i': inputFileName = optarg; break;
             case 'o': outputFileName = optarg; break;
             case 't': numThreads = atoi(optarg); break;
-			case 'n': num_lines = atoi(optarg); break;
+			case 'n': input_size = atoi(optarg); break;
 			case 'g': pe_group = atoi(optarg); break;
+			case 's': setting = atoi(optarg); break;
             case 'h': help(); return 0;
-			case 's': serial = 1; break;
+			case 'x': output = 1; break;
 			case 'p': parallel = 1; break;
 			case 'k': print_score = 1; break;
-			case 'a': accelerator_kernel = 1; break;
             default: help(); return 1;
         }
     }
 
-	// if (argc < 3) {
-	// 	fprintf(stderr, "Usage: ksw <input.txt> <output.txt>\n");
-	// 	return 1;
-	// }
-	// inputFileName = argv[1];
-	// outputFileName = argv[2];
+	if (input_size == 0) {
+		fprintf(stderr, "Please specify input size with -n flag\n");
+		return 1;
+	}
 
 	/* initialize scoring matrix
 		 1  -4  -4  -4  -1
@@ -666,10 +827,6 @@ int main(int argc, char *argv[])
 		mat[k++] = -1; // ambiguous base
 	}
 	for (j = 0; j < 5; ++j) mat[k++] = -1;
-
-	// open file
-	// fp_in = fopen(argv[1], "r");
-	// fp_out = fopen(argv[2], "w");
 
 	printf("%s %s\n", inputFileName, outputFileName);
 	fp_in = fopen(inputFileName, "r");
@@ -692,17 +849,18 @@ int main(int argc, char *argv[])
 	int numLinesRead = 0;
 
 	char* query = 0, *target = 0;
-	// int h0, qlen, tlen, w;
-	// int score = 0, qle = 0, tle = 0, gtle = 0, gscore = 0, max_off = 0;
 	double runtime = 0;
 	int64_t numCellsComputed = 0;
 	SeqPair* SeqPairArr;
 	SeqPairArr = (SeqPair*) malloc(num_lines * sizeof(SeqPair));
+	int64_t cycle_serial = 0;
 	struct timeval start_time, end_time;
 	//
 	// Read input data
 	//
+	int input_index = 0;
 	while (fgets(line, sizeof(line), fp_in) != NULL && numLinesRead < MAX_SEQ) {
+		input_index++;
 		linePtr = line;
 		if (!isalpha(*linePtr)) continue;
 		query = strsep(&linePtr, delim);
@@ -723,24 +881,32 @@ int main(int argc, char *argv[])
 
     	gettimeofday(&start_time, NULL);
 
-		// SeqPairArr[numLinesRead].score = ksw_extend2(SeqPairArr[numLinesRead].qlen, SeqPairArr[numLinesRead].read_ar, SeqPairArr[numLinesRead].tlen, SeqPairArr[numLinesRead].ref_ar, 5, mat, gapo, gape, gapo, gape, SeqPairArr[numLinesRead].w, 5, 100, SeqPairArr[numLinesRead].h0, &SeqPairArr[numLinesRead].qle, &SeqPairArr[numLinesRead].tle, &SeqPairArr[numLinesRead].gtle, &SeqPairArr[numLinesRead].gscore, &SeqPairArr[numLinesRead].max_off, &numCellsComputed, print_score); 
-		// SeqPairArr[numLinesRead].score = ksw_extend2_new(sa, sb, SeqPairArr[numLinesRead].qlen, SeqPairArr[numLinesRead].read_ar, SeqPairArr[numLinesRead].tlen, SeqPairArr[numLinesRead].ref_ar, 5, mat, gapo, gape, SeqPairArr[numLinesRead].w, 5, SeqPairArr[numLinesRead].h0, &SeqPairArr[numLinesRead].qle, &SeqPairArr[numLinesRead].tle, &SeqPairArr[numLinesRead].gtle, &SeqPairArr[numLinesRead].gscore, &SeqPairArr[numLinesRead].max_off, &numCellsComputed, print_score); 
+		
+		if (setting == 0) SeqPairArr[numLinesRead].score = ksw_extend2(SeqPairArr[numLinesRead].qlen, SeqPairArr[numLinesRead].read_ar, SeqPairArr[numLinesRead].tlen, SeqPairArr[numLinesRead].ref_ar, 5, mat, gapo, gape, gapo, gape, SeqPairArr[numLinesRead].w, 5, 100, SeqPairArr[numLinesRead].h0, &SeqPairArr[numLinesRead].qle, &SeqPairArr[numLinesRead].tle, &SeqPairArr[numLinesRead].gtle, &SeqPairArr[numLinesRead].gscore, &SeqPairArr[numLinesRead].max_off, &numCellsComputed, print_score);
+		else if (setting == 1) SeqPairArr[numLinesRead].score = ksw_extend2_new(sa, sb, SeqPairArr[numLinesRead].qlen, SeqPairArr[numLinesRead].read_ar, SeqPairArr[numLinesRead].tlen, SeqPairArr[numLinesRead].ref_ar, 5, mat, gapo, gape, SeqPairArr[numLinesRead].w, 5, SeqPairArr[numLinesRead].h0, &SeqPairArr[numLinesRead].qle, &SeqPairArr[numLinesRead].tle, &SeqPairArr[numLinesRead].gtle, &SeqPairArr[numLinesRead].gscore, &SeqPairArr[numLinesRead].max_off, &numCellsComputed, &cycle_serial, print_score, pe_group); 
+		else if (setting == 2) SeqPairArr[numLinesRead].score = ksw_extend2_test_gendp(SeqPairArr[numLinesRead].qlen, SeqPairArr[numLinesRead].read_ar, SeqPairArr[numLinesRead].tlen, SeqPairArr[numLinesRead].ref_ar, 5, mat, gapo, gape, gapo, gape, SeqPairArr[numLinesRead].w, 5, 100, SeqPairArr[numLinesRead].h0, &(SeqPairArr[numLinesRead].qle), &(SeqPairArr[numLinesRead].tle), &(SeqPairArr[numLinesRead].gtle), &(SeqPairArr[numLinesRead].gscore), &(SeqPairArr[numLinesRead].max_off), &numCellsComputed, print_score); 
 
-		// score = ksw_extend2(qlen, read_ar, tlen, ref_ar, 5, mat, gapo, gape, gapo, gape, w, 5, 100, h0, &qle, &tle, &gtle, &gscore, &max_off, &numCellsComputed, &numQuery, print_score); 
 		
 		gettimeofday(&end_time, NULL);
    	 	runtime += (end_time.tv_sec - start_time.tv_sec) * 1e6 + (end_time.tv_usec - start_time.tv_usec);
 		
-		if(serial) fprintf(fp_out, "%d,%d,%d,%d,%d,%d\n", SeqPairArr[numLinesRead].score, SeqPairArr[numLinesRead].qle, SeqPairArr[numLinesRead].tle, SeqPairArr[numLinesRead].gtle, SeqPairArr[numLinesRead].gscore, SeqPairArr[numLinesRead].max_off);
+		if(output) fprintf(fp_out, "%d,%d,%d,%d,%d,%d\n", SeqPairArr[numLinesRead].score, SeqPairArr[numLinesRead].qle, SeqPairArr[numLinesRead].tle, SeqPairArr[numLinesRead].gtle, SeqPairArr[numLinesRead].gscore, SeqPairArr[numLinesRead].max_off);
 		
 		numLinesRead += 1;
-		free(read_ar);
-		free(ref_ar);
+		free(SeqPairArr[numLinesRead].read_ar);
+		free(SeqPairArr[numLinesRead].ref_ar);
+		if (input_size == input_index) break;
 	}
 	printf("Update %ld cells\n", numCellsComputed);
     fprintf(stderr, "Time in kernel: %.2f sec\n", runtime * 1e-6);
 
 	fclose(fp_in);
+
+	if (parallel) {
+
+		int *cells, *array;
+		cells = (int*)malloc(sizeof(int) * numLinesRead);
+
 
 #pragma omp parallel num_threads(numThreads)
 {
@@ -769,47 +935,67 @@ int main(int argc, char *argv[])
 
 #pragma omp parallel num_threads(numThreads)
 {
-    int tid = omp_get_thread_num();
-	#pragma omp for schedule(dynamic, 1)
-	for(i = 0; i < numLinesRead; i++) {
-		int64_t numCellsComputed = 0;
-		int64_t cycle = 0;
+		int tid = omp_get_thread_num();
+		#pragma omp for schedule(dynamic, 1)
+		for(i = 0; i < numLinesRead; i++) {
+			int64_t numCellsComputed = 0;
+			int64_t cycle = 0;
 
-		if (accelerator_kernel) SeqPairArr[i].score = ksw_extend2_new(sa, sb, SeqPairArr[i].qlen, SeqPairArr[i].read_ar, SeqPairArr[i].tlen, SeqPairArr[i].ref_ar, 5, mat, gapo, gape, SeqPairArr[i].w, 5, SeqPairArr[i].h0, &(SeqPairArr[i].qle), &(SeqPairArr[i].tle), &(SeqPairArr[i].gtle), &(SeqPairArr[i].gscore), &(SeqPairArr[i].max_off), &numCellsComputed, &cycle, print_score, pe_group);
-		else SeqPairArr[i].score = ksw_extend2(SeqPairArr[i].qlen, SeqPairArr[i].read_ar, SeqPairArr[i].tlen, SeqPairArr[i].ref_ar, 5, mat, gapo, gape, gapo, gape, SeqPairArr[i].w, 5, 100, SeqPairArr[i].h0, &(SeqPairArr[i].qle), &(SeqPairArr[i].tle), &(SeqPairArr[i].gtle), &(SeqPairArr[i].gscore), &(SeqPairArr[i].max_off), &numCellsComputed, print_score); 
+			if (setting == 0) ksw_extend2(SeqPairArr[i].qlen, SeqPairArr[i].read_ar, SeqPairArr[i].tlen, SeqPairArr[i].ref_ar, 5, mat, gapo, gape, gapo, gape, SeqPairArr[i].w, 5, 100, SeqPairArr[i].h0, &SeqPairArr[i].qle, &SeqPairArr[i].tle, &SeqPairArr[i].gtle, &SeqPairArr[i].gscore, &SeqPairArr[i].max_off, &numCellsComputed, print_score);
+			else if (setting == 1) SeqPairArr[i].score = ksw_extend2_new(sa, sb, SeqPairArr[i].qlen, SeqPairArr[i].read_ar, SeqPairArr[i].tlen, SeqPairArr[i].ref_ar, 5, mat, gapo, gape, SeqPairArr[i].w, 5, SeqPairArr[i].h0, &(SeqPairArr[i].qle), &(SeqPairArr[i].tle), &(SeqPairArr[i].gtle), &(SeqPairArr[i].gscore), &(SeqPairArr[i].max_off), &numCellsComputed, &cycle, print_score, pe_group);
+			else if (setting == 2) SeqPairArr[i].score = ksw_extend2_test_gendp(SeqPairArr[i].qlen, SeqPairArr[i].read_ar, SeqPairArr[i].tlen, SeqPairArr[i].ref_ar, 5, mat, gapo, gape, gapo, gape, SeqPairArr[i].w, 5, 100, SeqPairArr[i].h0, &(SeqPairArr[i].qle), &(SeqPairArr[i].tle), &(SeqPairArr[i].gtle), &(SeqPairArr[i].gscore), &(SeqPairArr[i].max_off), &numCellsComputed, print_score);
+			
+			if (output) fprintf(fp_out, "%d %d %d %d %d %d\n", SeqPairArr[i].score, SeqPairArr[i].qle, SeqPairArr[i].tle, SeqPairArr[i].gtle, SeqPairArr[i].gscore, SeqPairArr[i].max_off);
+
+			int cell, tmp;
+			cells[i] = numCellsComputed;
+
+			if (i%SIMD == 0 && i > 0) {
+				array = (int*)malloc(sizeof(int) * SIMD);
+				for (k=0;k<SIMD;k++) array[k] = cells[i-SIMD+k];
+				numCellsUpdate[tid * CLMUL] += (max_func(array, SIMD) + 3) * SIMD;
+				free(array);
+			}
+			if (i == numLinesRead-1) {			
+				int z = (numLinesRead-1)%SIMD;
+				array = (int*)malloc(sizeof(int) * (z+1));
+				for (k=0;k<z+1;k++) array[k] = cells[i-z+k];
+				numCellsUpdate[tid * CLMUL] += (max_func(array, (z+1)) + z) * (z+1);
+				free(array);
+			}
 		
-		if (parallel) fprintf(fp_out, "%d %d %d %d %d %d\n", SeqPairArr[i].score, SeqPairArr[i].qle, SeqPairArr[i].tle, SeqPairArr[i].gtle, SeqPairArr[i].gscore, SeqPairArr[i].max_off);
-
-		numCellsUpdate[tid * CLMUL] += numCellsComputed;
-		numCycles[tid * CLMUL] += cycle;
-	}
+			numCycles[tid * CLMUL] += cycle;
+		}
 }
 
-#if RAPL
-	rapl->sample();
-	float total_time = rapl->total_time();
-	float pkg_power = rapl->pkg_average_power();
-	float dram_power = rapl->dram_average_power();
-	printf("Running time is %f sec.\n", total_time);
-	printf("Power: pkg %f W; DRAM %f W\n", pkg_power, dram_power);
-#endif
+		free(cells);
+	#if RAPL
+		rapl->sample();
+		float total_time = rapl->total_time();
+		float pkg_power = rapl->pkg_average_power();
+		float dram_power = rapl->dram_average_power();
+		printf("Running time is %f sec.\n", total_time);
+		printf("Power: pkg %f W; DRAM %f W\n", pkg_power, dram_power);
+	#endif
 
 
-	gettimeofday(&end_time, NULL);
-    TotalRuntime += (end_time.tv_sec - start_time.tv_sec) * 1e6 + (end_time.tv_usec - start_time.tv_usec);
+		gettimeofday(&end_time, NULL);
+		TotalRuntime += (end_time.tv_sec - start_time.tv_sec) * 1e6 + (end_time.tv_usec - start_time.tv_usec);
 
-	for (i = 0; i < numThreads; i++) {
-		TotalCellsUpdate += numCellsUpdate[i * CLMUL];
-		TotalCycles += numCycles[i * CLMUL];
+		for (i = 0; i < numThreads; i++) {
+			TotalCellsUpdate += numCellsUpdate[i * CLMUL];
+			TotalCycles += numCycles[i * CLMUL];
+		}
+
+		double GCUPS = TotalCellsUpdate / (TotalCycles / 64 / 4 / 1.5);
+
+		printf("Update %ld cells\n", TotalCellsUpdate);
+		printf("cycle: %ld\n", TotalCycles);
+		printf("GCUPS: %lf\n", GCUPS);
+		fprintf(stderr, "Parallel Time: %.2f sec\n", TotalRuntime * 1e-6);
+	
 	}
 
-	double GCUPS = TotalCellsUpdate / (TotalCycles / 64 / 4 / 1.5);
-
-	printf("Update %ld cells\n", TotalCellsUpdate);
-	printf("cycle: %ld\n", TotalCycles);
-	printf("GCUPS: %lf\n", GCUPS);
-    fprintf(stderr, "Parallel Time: %.2f sec\n", TotalRuntime * 1e-6);
-	
 	fclose(fp_out);
 	return 0;
 }

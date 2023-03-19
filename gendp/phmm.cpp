@@ -160,7 +160,7 @@ void phmm_simulate(pe_array *pe_array_unit, phmm* phmm_input, int n, FILE* fp, i
         pe_array_unit->input_buffer_write_from_ddr(7+i+phmm_input->len_hap+phmm_input->len_read*5, &zero);
 
 
-    // printf("cells %d ", phmm_input->len_read * phmm_input->len_hap);
+    printf("cells %d ", phmm_input->len_read * phmm_input->len_hap);
     pe_array_unit->run(n, simd, PE_4_SETTING, MAIN_INSTRUCTION_2);
 
     if (show_output) pe_array_unit->phmm_show_output_buffer(fp);

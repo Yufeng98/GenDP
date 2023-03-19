@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <cstdlib>
 
 #ifndef DENORMALS
 #include <xmmintrin.h>
@@ -33,14 +34,19 @@ int main (const int argc, char const * const argv[]) {
     // PairhmmAVXDouble2DiagsImpl
   >{};
   InputReader<TestcaseIterator> reader {};
-  if (argc == 2)
-    reader.from_file(argv[1]);
+  // if (argc == 2)
+  reader.from_file(argv[1]);
   double computation_time = 0.f;
   Chronos time;
+  int index = 0;
+  int input_size = atoi(argv[2]);
   for (auto& testcase : reader) {
+    index++;
+    // printf("%d\n", index);
     time.reset();
     auto results = pairhmm.calculate(testcase);
     computation_time += time.elapsed();
+    if (input_size > 0 && input_size == index) break;
     // for (auto x : results)
     //   cout << x << "\n";
     // cout << "\n";

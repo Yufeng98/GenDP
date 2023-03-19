@@ -5,7 +5,7 @@
 #include "compute_unit_32.h"
 #include "comp_decoder.h"
 
-void host_chain_kernel(std::vector<call_t> &arg, std::vector<return_t> &ret, int numThreads, int setting);
+void host_chain_kernel(std::vector<call_t> &arg, std::vector<return_t> &ret, int numThreads, int setting, int input_size);
 
 void execute_instrution(int id, long instruction, comp_decoder* decoder_unit, compute_unit_32* cu, int* regfile);
 

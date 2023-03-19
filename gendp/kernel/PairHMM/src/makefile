@@ -1,7 +1,7 @@
 #CXXFLAGS=-c -Wall -std=c++11 -g -mfpmath=sse -O4 -march=corei7 -pedantic
 CXX = g++
 CXXFLAGS=-Wall -Wno-unused-variable -Wno-unused-value -std=c++1y -g -msse -mfpmath=sse -ffast-math -O2 -pedantic -march=corei7-avx# -Wa,-q  -fsanitize=address -static-libasan -g
-SIMULATOR_PATH=../../../simulator
+SIMULATOR_PATH=../../../
 INCLUDE=-I$(SIMULATOR_PATH)
 LDFLAGS=-L.
 SOURCES= testcase.cpp testcase_iterator.cpp main.cpp diagonals.cpp

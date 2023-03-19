@@ -359,7 +359,7 @@ void bsw_simulation(char *inputFileName, char *outputFileName, FILE *fp, int sho
             index += 6;
         }
     } else {
-        for (i = 0; i < simulation_cases; i++) {
+        for (i = 0; i < simulation_cases/SIMD_WIDTH8; i++) {
             bsw_simulate(pe_array_unit, bsw_input+i, 100000, fp, show_output, bsw_output + index);
             index += 6;
         }

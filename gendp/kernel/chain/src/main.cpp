@@ -67,13 +67,14 @@ int main(int argc, char **argv) {
     std::string inputFileName, outputFileName;
 
     char opt;
-    int numThreads = 1, setting = 0;
-    while ((opt = getopt(argc, argv, ":i:o:t:s:h")) != -1) {
+    int numThreads = 1, setting = 0, input_size = -1;
+    while ((opt = getopt(argc, argv, "i:o:t:s:n:h")) != -1) {
         switch (opt) {
             case 'i': inputFileName = optarg; break;
             case 'o': outputFileName = optarg; break;
             case 't': numThreads = atoi(optarg); break;
             case 's': setting = atoi(optarg); break;
+            case 'n': input_size = atoi(optarg); break;
             case 'h': help(); return 0;
             default: help(); return 1;
         }
@@ -134,7 +135,7 @@ int main(int argc, char **argv) {
 
     gettimeofday(&start_time, NULL);
 
-    host_chain_kernel(calls, rets, numThreads, setting);
+    host_chain_kernel(calls, rets, numThreads, setting, input_size);
 
     gettimeofday(&end_time, NULL);
 

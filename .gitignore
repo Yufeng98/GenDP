@@ -4,6 +4,7 @@ sim*
 *sim_results
 *_output*
 *_correctness
+*_correctness.txt
 *_instruction.txt
 *.o
 *.a

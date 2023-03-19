@@ -49,7 +49,7 @@ for i in range(num_threads):
 f.write("\ndone\n\n")
 
 for i in range(total_consensus%num_threads):
-    f.write("python3 scripts/poa_check_correctness.py poa_output/output_$((i*num_threads+" + str(i+1) + ")) datasets/poa/output/output_$((i*num_threads+" + str(i+1) + ")) 0 > poa_correctness/poa_$((i*num_threads+" + str(i+1) + ")).txt &\n")
+    f.write("python3 scripts/poa_check_correctness.py poa_output/output_" + str(total_consensus//num_threads * num_threads + i + 1) + " datasets/poa/output/output_" + str(total_consensus//num_threads * num_threads + i + 1) + " 0 > poa_correctness/poa_" + str(total_consensus//num_threads * num_threads + i + 1) + ".txt &\n")
     f.write("  P{}=$!\n".format(i+1))
 if total_consensus%num_threads > 0:
     f.write("wait")
@@ -79,7 +79,7 @@ for i in range(num_threads):
 f.write("\ndone\n\n")
 
 for i in range(total_consensus%num_threads):
-    f.write("./poa -read_fasta ../../datasets/poa/poa_$((i*num_threads+" + str(i+1) + ")) -clustal clustal-180.out -hb blosum80_small.mat &\n")
+    f.write("./poa -read_fasta ../../datasets/poa/poa_" + str(total_consensus//num_threads * num_threads + i + 1) + " -clustal clustal-180.out -hb blosum80_small.mat &\n")
     f.write("  P{}=$!\n".format(i+1))
 if total_consensus%num_threads > 0:
     f.write("wait")

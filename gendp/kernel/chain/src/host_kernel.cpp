@@ -7,8 +7,8 @@
 #include "host_kernel.h"
 #include "common.h"
 // #include "minimap.h"
-#include "mmpriv.h"
-#include "kalloc.h"
+// #include "mmpriv.h"
+// #include "kalloc.h"
 #include "fixed.h"
 // #include "compute_unit_32.h"
 // #include "comp_decoder.h"
@@ -659,7 +659,7 @@ void chain_dp_instruction(call_t* a, return_t* ret, int64_t* num_anchor, int64_t
 
 }
 
-void host_chain_kernel(std::vector<call_t> &args, std::vector<return_t> &rets, int numThreads, int setting)
+void host_chain_kernel(std::vector<call_t> &args, std::vector<return_t> &rets, int numThreads, int setting, int input_size)
 {
 	int64_t total_num_anchor[numThreads * CLMUL], totalNumAnchor = 0;
 	int64_t total_num_cell[numThreads * CLMUL], totalNumCell = 0;
@@ -705,8 +705,14 @@ void host_chain_kernel(std::vector<call_t> &args, std::vector<return_t> &rets, i
 	#pragma omp parallel num_threads(numThreads)
 	{
 		int tid = omp_get_thread_num();
+		int iteration = 0;
+		if (input_size < 0 || input_size > (int)args.size()) {
+			iteration = args.size();
+		} else {
+			iteration = input_size;
+		}
 		#pragma omp for schedule(dynamic, 1)
-        for (size_t batch = 0; batch < args.size(); batch++) {
+        for (int batch = 0; batch < iteration; batch++) {
 			int64_t num_anchor = 0;
 			int64_t num_cell = 0;
 			int64_t all_cell = 0;
@@ -714,7 +720,7 @@ void host_chain_kernel(std::vector<call_t> &args, std::vector<return_t> &rets, i
 			call_t* arg = &args[batch];
 			return_t* ret = &rets[batch];
 
-			printf("setting: %d.\n", setting);
+			// printf("setting: %d.\n", setting);
 			// fprintf(stderr, "%lld\t%f\t%d\t%d\t%d\t%d\n", arg->n, arg->avg_qspan, arg->max_dist_x, arg->max_dist_y, arg->bw, arg->n_segs);
 			if (setting == 0) chain_dp(arg, ret, &num_anchor, &num_cell, &all_cell, &cycle);
 			if (setting == 1) chain_dp_copy(arg, ret, &num_anchor, &num_cell, &all_cell, &cycle);

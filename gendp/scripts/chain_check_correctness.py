@@ -7,7 +7,7 @@ lines = f.readlines()
 f_1 = open(file_name_1, 'r')
 lines_1 = f_1.readlines()
 
-n = len(lines)
+n = min(len(lines), len(lines_1))
 err = {}
 err_sum = 0
 for i in range(n):
