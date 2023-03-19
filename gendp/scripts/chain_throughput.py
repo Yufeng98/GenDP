@@ -26,12 +26,12 @@ file_correctness = sys.argv[2]
 f_correctness = open(file_correctness, "r")
 lines_correctness = f_correctness.readlines()
 if not len(lines_correctness) > 1:
-    print("Simulation results verified.")
+    print("Chain Simulation results verified.")
 else:
-    print("Simulation results failed.")
+    print("Chain Simulation results failed.")
     print(lines_correctness)
 
-print("Throughput in {}GHz {:.3f} MCUPS/mm2".format(freq, cells*freq/time/(1024*1024)/area*area_scaling_factor_7nm/cells_overhead))
+print("Chain Throughput: {:.3f} MCUPS/mm2".format(cells*freq/time/(1024*1024)/area*area_scaling_factor_7nm/cells_overhead))
 # print("Throughput in {}GHz {:.3f} Reads/mm2".format(freq, reads*freq/time/area*area_scaling_factor_7nm))
 # print("Cycle", cycle)
 # print("Cells", cells)

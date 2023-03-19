@@ -41,7 +41,7 @@ int main(int argc,char *argv[])
   LPOSequence_T **input_seqs=NULL;
   FILE *errfile=stderr,*logfile=NULL,*lpo_file_out=NULL,*po_list_file=NULL,*seq_ifile=NULL;
   char *print_matrix_letters=NULL,*fasta_out=NULL,*po_out=NULL,*matrix_filename=NULL,
-    *seq_filename=NULL,*frame_dna_filename=NULL,*po_filename=NULL,*po2_filename=NULL,
+    *seq_filename=NULL,*datasets_path=NULL,*frame_dna_filename=NULL,*po_filename=NULL,*po2_filename=NULL,
     *po_list_filename=NULL, *hbmin=NULL,*numeric_data=NULL,*numeric_data_name=(char*)"Nmiscall",
     *dna_to_aa=NULL,*pair_score_file=NULL,*aafreq_file=NULL,*termval_file=NULL,
     *bold_seq_name=NULL,*subset_file=NULL,*subset2_file=NULL,*rm_subset_file=NULL,
@@ -125,6 +125,7 @@ int main(int argc,char *argv[])
     ARGGET("-remove",rm_subset_file); /* FILENAME TO READ SEQ REMOVAL LIST*/
     ARGGET("-remove2",rm_subset2_file); /* FILENAME TO READ SEQ REMOVAL LIST*/
     ARGGET("-read_fasta",seq_filename); /* READ FASTA FILE FOR ALIGNMENT */
+    ARGGET("-datasets_path",datasets_path); /* READ FASTA FILE FOR ALIGNMENT */
     NEXTARG(matrix_filename); /* NON-FLAG ARG SHOULD BE MATRIX FILE */   
   }
 
@@ -298,11 +299,12 @@ int main(int argc,char *argv[])
       int pos = 0;
       std::string id;
       std::string name(seq_filename);
+      std::string path(datasets_path);
       pos = name.find("_");
       id = name.substr(pos, name.length());
 
-      std::string input = "../../datasets/poa/input/input" + id;
-      std::string output = "../../datasets/poa/output/output" + id;
+      std::string input = path + "/poa/input/input" + id;
+      std::string output = path + "/poa/output/output" + id;
       printf("%s\n", input.c_str());
       FILE *fp_in = NULL, *fp_out = NULL;
       fp_in = fopen(input.c_str(), "w");

@@ -6,7 +6,8 @@
 #include <algorithm>
 #include <ostream>
 #include <cassert>
-
+#include <stdexcept>
+#include <limits>
 #include "testcase.h"
 #include "constants.h"
 #include "diagonals.h"

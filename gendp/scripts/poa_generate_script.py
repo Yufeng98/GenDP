@@ -13,6 +13,9 @@ filename_kernel = sys.argv[2]
 total_consensus = int(sys.argv[3])
 num_threads = int(sys.argv[4])
 
+if total_consensus < 0:
+    total_consensus = 6216
+
 f = open(filename_simulation, "w")
 f.write("#!/bin/bash\n\n")
 f.write("python3 scripts/poa_instruction_generator.py\n")
@@ -23,7 +26,7 @@ f.write("num_threads={}\n\n".format(num_threads))
 
 f.write("for i in {0.." + str(total_consensus//num_threads-1) + "}\ndo\n")
 for i in range(num_threads):
-    f.write("  ./sim_poa_throughput -k 3 -i datasets/poa/input/input_$((i*num_threads+" + str(i+1) + ")) -o poa_output/output_$((i*num_threads+" + str(i+1) + ")) -s > poa_sim_results/sim_result_$((i*num_threads+" + str(i+1) + ")).txt &\n")
+    f.write("  ./sim_poa_throughput -k 3 -i ../gendp-datasets/poa/input/input_$((i*num_threads+" + str(i+1) + ")) -o poa_output/output_$((i*num_threads+" + str(i+1) + ")) -s > poa_sim_results/sim_result_$((i*num_threads+" + str(i+1) + ")).txt &\n")
     f.write("  P{}=$!\n".format(i+1))
 f.write("  wait")
 for i in range(num_threads):
@@ -31,7 +34,7 @@ for i in range(num_threads):
 f.write("\ndone\n\n")
 
 for i in range(total_consensus%num_threads):
-    f.write("./sim_poa_throughput -k 3 -i datasets/poa/input/input_" + str(total_consensus//num_threads * num_threads + i + 1) + " > poa_sim_results/sim_result_" + str(total_consensus//num_threads * num_threads + i + 1) + ".txt &\n")
+    f.write("./sim_poa_throughput -k 3 -i ../gendp-datasets/poa/input/input_" + str(total_consensus//num_threads * num_threads + i + 1) + " -o poa_output/output_" + str(total_consensus//num_threads * num_threads + i + 1) + " -s > poa_sim_results/sim_result_" + str(total_consensus//num_threads * num_threads + i + 1) + ".txt &\n")
     f.write("  P{}=$!\n".format(i+1))
 if total_consensus%num_threads > 0:
     f.write("wait")
@@ -41,7 +44,7 @@ if total_consensus%num_threads > 0:
     
 f.write("for i in {0.." + str(total_consensus//num_threads-1) + "}\ndo\n")
 for i in range(num_threads):
-    f.write("  python3 scripts/poa_check_correctness.py poa_output/output_$((i*num_threads+" + str(i+1) + ")) datasets/poa/output/output_$((i*num_threads+" + str(i+1) + ")) 0 > poa_correctness/poa_$((i*num_threads+" + str(i+1) + ")).txt &\n")
+    f.write("  python3 scripts/poa_check_correctness.py poa_output/output_$((i*num_threads+" + str(i+1) + ")) ../gendp-datasets/poa/output/output_$((i*num_threads+" + str(i+1) + ")) 0 > poa_correctness/poa_$((i*num_threads+" + str(i+1) + ")).txt &\n")
     f.write("  P{}=$!\n".format(i+1))
 f.write("  wait")
 for i in range(num_threads):
@@ -49,7 +52,7 @@ for i in range(num_threads):
 f.write("\ndone\n\n")
 
 for i in range(total_consensus%num_threads):
-    f.write("python3 scripts/poa_check_correctness.py poa_output/output_" + str(total_consensus//num_threads * num_threads + i + 1) + " datasets/poa/output/output_" + str(total_consensus//num_threads * num_threads + i + 1) + " 0 > poa_correctness/poa_" + str(total_consensus//num_threads * num_threads + i + 1) + ".txt &\n")
+    f.write("python3 scripts/poa_check_correctness.py poa_output/output_" + str(total_consensus//num_threads * num_threads + i + 1) + " ../gendp-datasets/poa/output/output_" + str(total_consensus//num_threads * num_threads + i + 1) + " 0 > poa_correctness/poa_" + str(total_consensus//num_threads * num_threads + i + 1) + ".txt &\n")
     f.write("  P{}=$!\n".format(i+1))
 if total_consensus%num_threads > 0:
     f.write("wait")
@@ -71,7 +74,7 @@ f.write("num_threads={}\n\n".format(num_threads))
 
 f.write("for i in {0.." + str(total_consensus//num_threads-1) + "}\ndo\n")
 for i in range(num_threads):
-    f.write("  ./poa -read_fasta ../../datasets/poa/poa_$((i*num_threads+" + str(i+1) + ")) -clustal clustal-180.out -hb blosum80_small.mat &\n")
+    f.write("  ./poa -datasets_path ../../../gendp-datasets -read_fasta ../../../gendp-datasets/poa/poa_$((i*num_threads+" + str(i+1) + ")) -clustal tmp -hb blosum80_small.mat &\n")
     f.write("  P{}=$!\n".format(i+1))
 f.write("  wait")
 for i in range(num_threads):
@@ -79,7 +82,7 @@ for i in range(num_threads):
 f.write("\ndone\n\n")
 
 for i in range(total_consensus%num_threads):
-    f.write("./poa -read_fasta ../../datasets/poa/poa_" + str(total_consensus//num_threads * num_threads + i + 1) + " -clustal clustal-180.out -hb blosum80_small.mat &\n")
+    f.write("./poa -datasets_path ../../../gendp-datasets -read_fasta ../../../gendp-datasets/poa/poa_" + str(total_consensus//num_threads * num_threads + i + 1) + " -clustal tmp -hb blosum80_small.mat &\n")
     f.write("  P{}=$!\n".format(i+1))
 if total_consensus%num_threads > 0:
     f.write("wait")

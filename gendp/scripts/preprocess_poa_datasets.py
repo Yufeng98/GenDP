@@ -1,10 +1,10 @@
 import sys
 import os
 
-if not os.path.exists("datasets/poa/input"):
-    os.makedirs("datasets/poa/input")
-if not os.path.exists("datasets/poa/output"):
-    os.makedirs("datasets/poa/output")
+if not os.path.exists("../gendp-datasets/poa/input"):
+    os.makedirs("../gendp-datasets/poa/input")
+if not os.path.exists("../gendp-datasets/poa/output"):
+    os.makedirs("../gendp-datasets/poa/output")
 
 file_name = sys.argv[1]
 folder = sys.argv[2]
