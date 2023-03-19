@@ -55,11 +55,11 @@ freq = 2
 area = 5.4
 
 if correctness_check_flag:
-    print("Simulation results verified.")
+    print("POA Simulation results verified.")
 else:
-    print("Simulation results failed.")
+    print("POA Simulation results failed.")
 
-print("Throughput in {}GHz {:.3f} MCUPS/mm2".format(freq, 16*dic["cells"]*freq/time/(1024*1024)/area*area_scaling_factor_7nm))
+print("POA Throughput: {:.3f} MCUPS/mm2".format(16*dic["cells"]*freq/time/(1024*1024)/area*area_scaling_factor_7nm))
 # print("Throughput in {}GHz {:.3f} KReads/mm2".format(freq, 16*dic["reads"]*freq/time/1024/area*area_scaling_factor_7nm))
 # print("Cycle", dic["cycle"])
 # print("Cells", dic["cells"])

@@ -1,4 +1,5 @@
 build/
+gendp-datasets*
 datasets/
 sim*
 *sim_results
@@ -8,5 +9,5 @@ sim*
 *_instruction.txt
 *.o
 *.a
-log.txt
+*log.txt
 tmp
