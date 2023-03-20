@@ -30,6 +30,9 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
 See PairHMM runtime(s) after `PairHMM completed. Kernel runtime:`
 
 #### POA
+
+Install the latest ZLIB with `sudo apt-get install zlib1g-dev` on ubuntu or `sudo yum install zlib-devel zlib-static` on CentOS. If you installed  ZLIB but the system could not detect it, specify with cmake argument by `-DZLIB_INCLUDE_DIR=<ZLIB_PATH>`.
+
 ```bash
 cd $GenDP_WORK_DIR/cpu-baselines/poa/racon
 mkdir build

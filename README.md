@@ -9,12 +9,12 @@ The table below shows the CPU system configuration and runtime (in seconds) for 
 | Intel(R) Xeon(R) Platinum 8380 CPU @ 2.30GHz | AVX512    | CentOS Linux 7 (CORE) | 80      | 0.0504 | 0.306 | 0.587   | 16.6  |
 | Intel(R) Xeon(R) Gold 6326 CPU @ 2.90GHz     | AVX512    | Ubuntu 20.04.5 LTS    | 32      | 0.0984 | 0.473 | 0.678   | 34.3  |
 | Intel(R) Xeon(R) CPU E5-2697 v3 @ 2.60GHz    | AVX2      | CentOS Linux 7 (CORE) | 28      | 0.196  | 2.35  | 2.13    | 41.7  |
-| Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz      | AVX2      | Ubuntu 20.04.5 LTS    | 8       | 0.278  | 4.98  | 2.13    | 90.1  |
-
+| 12th Gen Intel(R) Core(TM) i5-12600          | AVX2      | Ubuntu 22.04.2 LTS    | 12      | 0.140  | 2.21  | 1.71    | 36.6  |
+| Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz      | AVX2      | Ubuntu 20.04.5 LTS    | 8       | 0.29   | 4.79  | 4.51    | 98.5  |
 
 ### GPU Baselines
 
-The table below shows the GPU system configuration and runtime (in seconds) for each kernel.
+The table below shows the GPU system configuration and runtime (in seconds) for each kernel. 
 
 | GPU                | Arch Code | CUDA Version | BSW   | Chain | PairHMM | POA  |
 | ------------------ | --------- | ---- | ----- | ----- | ------  | ---- |
@@ -24,20 +24,21 @@ The table below shows the GPU system configuration and runtime (in seconds) for 
 
 ### GenDP Speedup Over CPU/GPU
 
-The CPU baselines are obtained from the Intel Xeon Platinum 8380 CPU @ 2.30GHz with 80 threads in 1 socket and AVX512. The CPU die area is 600mm<sup>2</sup>. The GPU baselines are obtained from the NVIDIA RTX A100 and its die area is 826mm<sup>2</sup>. In the `Chain` benchmark, GPU and GenDP throughputs are penalized by 3.72x because they use a re-ordered chaining algorithm and compute 3.72x more cells than the CPU implementation. The CPU baselines and GenDP throughputs are normalized to 7nm technology for a fair comparison with GPU baselines. GenDP achieves an average 157.8x throughput/mm<sup>2</sup> speedup over GPU.
+The CPU baselines are obtained from the Intel Xeon Platinum 8380 CPU @ 2.30GHz with 80 threads in 1 socket and AVX512. The CPU die area is 600mm<sup>2</sup>. The GPU baselines are obtained from the NVIDIA RTX A100 and its die area is 826mm<sup>2</sup>. In the `Chain` benchmark, GPU and GenDP throughputs are penalized by 3.72x because they use a re-ordered chaining algorithm and compute 3.72x more cells than the CPU implementation. The CPU baselines and GenDP throughputs are normalized to 7nm technology for a fair comparison with GPU baselines. GenDP achieves an average 157.8x throughput/mm<sup>2</sup> speedup over GPU. The Metric used in the table is Giga Cell Updates per Second (GCUPS) and Mega Cell Updates per Second/mm<sup>2</sup> (MCUPS/mm<sup>2</sup>).
 
-|                             | BSW         | Chain       | PairHMM       | POA           |
-| --------------------------- | ----------- | ----------- | ------------- | ------------- |
-| Total Cell Updates          | 2431855834  | 20736142007 | 258363282803  | 6448581509    |
-| CPU Runtime (seconds)       | 0.0504      | 0.306       | 0.587         | 16.6          |
-| CPU GCUPS                   | 44.91       | 19.61       | 32.88         | 14.51         |
-| CPU Normalized MCUPS/mm<sup>2</sup>    | 130.29      | 56.89       | 95.41         | 42.11         |
-| GPU Runtime (seconds)       | 0.012       | 0.155       | 0.597         | 2.53          |
-| GPU GCUPS                   | 192.92      | 12.89       | 32.35         | 95.13         | 
-| GPU MCUPS/mm<sup>2</sup>    | 239.16      | 12.89       | 40.11         | 117.94        |
-| GenDP Normalized MCUPS/mm<sup>2</sup>  | 47574       | 3626        | 17681         | 2965          |
-| GenDP Speedup over CPU      | 365.1x      | 63.7x       | 185.3x        | 70.4x         |
-| GenDP Speedup over GPU      | 198.9x      | 281.4x      | 440.8x        | 25.1x         |
+|                                       | BSW         | Chain       | PairHMM       | POA           |
+| ------------------------------------- | ----------- | ----------- | ------------- | ------------- |
+| Total Cell Updates                    | 2431855834  | 20736142007 | 258363282803  | 6448581509    |
+| CPU Runtime (seconds)                 | 0.0504      | 0.306       | 0.587         | 16.6          |
+| CPU GCUPS                             | 44.91       | 19.61       | 32.88         | 14.51         |
+| CPU Normalized MCUPS/mm<sup>2</sup>   | 130.29      | 56.89       | 95.41         | 42.11         |
+| GPU Runtime (seconds)                 | 0.012       | 0.155       | 0.597         | 2.53          |
+| GPU GCUPS                             | 192.92      | 10.40       | 32.35         | 95.13         | 
+| GPU MCUPS/mm<sup>2</sup>              | 239.16      | 12.89       | 40.11         | 117.94        |
+| ASIC Normalized MCUPS/mm<sup>2</sup>  | 118,950      | -           | 51,867         | -             |
+| GenDP Normalized MCUPS/mm<sup>2</sup> | 47,574       | 3,626        | 17,681         | 2,965          |
+| GenDP Speedup over CPU                | 365.1x      | 63.7x       | 185.3x        | 70.4x         |
+| GenDP Speedup over GPU                | 198.9x      | 281.4x      | 440.8x        | 25.1x         |
 
 
 ### Instructions and Scripts
@@ -111,8 +112,12 @@ export GenDP_WORK_DIR=`pwd`
 # bash run-gendp-simulation.sh <Chain input size> <PairHMM input size> <POA input size>
 # See approximate runtime on different input sizes for each kernel in script run-gendp-simulation.sh
 # BSW simulation is fast and entire dataset is default.
-bash run-gendp-simulation.sh 500 100000 100 2>&1 | tee gendp-simulation-log.txt      # ~ 6 hours
-bash run-gendp-simulation.sh 1000 500000 200 2>&1 | tee gendp-simulation-log.txt     # ~ 24 hours
-bash run-gendp-simulation.sh -1 -1 -1 2>&1 | tee gendp-simulation-log.txt           # > 100 hours for entire dataset
+bash run-gendp-simulation.sh 500 100000 100 2>&1 | tee gendp-simulation-log.txt     # ~ 6 hours
+bash run-gendp-simulation.sh 2000 500000 200 2>&1 | tee gendp-simulation-log.txt    # ~ 24 hours
+bash run-gendp-simulation.sh -1 -1 -1 2>&1 | tee gendp-simulation-log.txt           # ~ 250 hours for entire dataset
 python3 $GenDP_WORK_DIR/profile-gendp-simulation-log.py gendp-simulation-log.txt
 ```
+
+### Issues and bug reporting
+
+We appreciate any feedback and suggestions from the community. Feel free to raise an issue or submit a pull request on Github. For assistance in using GenDP, please contact: Yufeng Gu (yufenggu AT umich DOT edu).

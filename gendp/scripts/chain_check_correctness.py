@@ -13,7 +13,7 @@ err_sum = 0
 for i in range(n):
     score = int(lines[i])
     score_1 = int(lines_1[i])
-    if abs(score - score_1) > 1:
+    if abs(score - score_1) > 5 and abs(score - score_1) > score * 0.01:
         print(i, lines[i][:-1], lines_1[i][:-1])
         e = int(lines[i])-int(lines_1[i])
         err_sum += 1

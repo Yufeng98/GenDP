@@ -16,7 +16,7 @@ make -j
 cd ../../
 bash scripts/bsw_throughput.sh -1
 
-### Chain   500 2h  1000 5h   10000 50h
+### Chain   500 1.5h  2000 6h   10000 30h
 cd $GenDP_WORK_DIR/gendp
 cd kernel/chain
 make clean
@@ -36,7 +36,7 @@ cd ../../
 mkdir -p phmm_sim_results
 bash scripts/phmm_throughput.sh $INPUT_SIZE_PHMM
 
-### POA     20 15 min   100 2h  200 6h  6216 >100h
+### POA     100 2h  200 6h  6216 200h
 cd $GenDP_WORK_DIR/gendp
 python3 scripts/poa_generate_script.py scripts/poa_throughput.sh kernel/poaV2/run.sh $INPUT_SIZE_POA 1
 python3 scripts/preprocess_poa_datasets.py $GenDP_WORK_DIR/gendp-datasets/poa_input.fasta $GenDP_WORK_DIR/gendp-datasets/poa
