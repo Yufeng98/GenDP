@@ -61,6 +61,9 @@ wget https://registrationcenter-download.intel.com/akdlm/irc_nas/19123/l_dpcpp-c
 sudo sh ./l_dpcpp-cpp-compiler_p_2023.0.0.25393_offline.sh
 # Activate OneAPI Toolkit
 source /opt/intel/oneapi/setvars.sh
+
+git clone --recursive https://github.com/Yufeng98/GenDP.git
+cd GenDP
 ```
 
 #### Step 2: Download Datasets
