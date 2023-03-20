@@ -26,7 +26,7 @@ The table below shows the GPU system configuration and the runtime(second) for e
 
 The CPU baselines are obtained from Intel(R) Xeon(R) Platinum 8380 CPU @ 2.30GHz with 80 threads in 1 socket and AVX512. THe CPU die area is 600mm2. The GPU baselines are obtained from NVIDIA RTX A100 and its die area is 826mm2. In `Chain` benchmark, GPU and GenDP throughputs are penalized by 3.72x because they use re-ordered chain algorithm and compute 3.72x more cells than CPU. The CPU baselines and GenDP throughputs are normalized to 7nm to make a fair comparison with GPU baselines. GenDP achieves 157.8x throughput/mm2 speedup over GPU.
 
-|                             | BSW         | CHain       | PairHMM       | POA           |
+|                             | BSW         | Chain       | PairHMM       | POA           |
 | --------------------------- | ----------- | ----------- | ------------- | ------------- |
 | Total Cell Updates          | 2431855834  | 20736142007 | 258363282803  | 6448581509    |
 | CPU Runtime (second)        | 0.0504      | 0.306       | 0.587         | 16.6          |
@@ -98,7 +98,7 @@ python3 $GenDP_WORK_DIR/profile-gpu-baselines-log.py gpu-baselines-log.txt
 
 #### Step 5: Run GenDP Simulator
 
-If there are errors during running, please see scripts in README under `gendp` folder for debugging.
+If there are errors during running, please see scripts in README under `gendp` folder for debugging. The simulation results could be different from the reported above (< 5% error) because the script does not run the entire datasets. The script could also be configured to run the extire datasets by changing parameters but it may takes ~100 hours for simulation. 
 
 ```bash
 export GenDP_WORK_DIR=`pwd`
