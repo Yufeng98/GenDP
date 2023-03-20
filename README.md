@@ -16,7 +16,7 @@ The table below shows the CPU system configuration and the runtime(second) for e
 
 The table below shows the GPU system configuration and the runtime(second) for each kernel.
 
-| GPU                | Arch Code | CUDA | BSW   | Chain | PairHMM | POA  |
+| GPU                | Arch Code | CUDA Version | BSW   | Chain | PairHMM | POA  |
 | ------------------ | --------- | ---- | ----- | ----- | ------  | ---- |
 | NVIDIA RTX A100    | sm_80     | 11.2 | 0.012 | 0.155 | 0.597   | 2.53 |
 | NVIDIA RTX A6000   | sm_86     | 12.0 | 0.012 | 0.339 | 0.572   | 3.70 |
@@ -26,18 +26,18 @@ The table below shows the GPU system configuration and the runtime(second) for e
 
 The CPU baselines are obtained from Intel(R) Xeon(R) Platinum 8380 CPU @ 2.30GHz with 80 threads in 1 socket and AVX512. THe CPU die area is 600mm2. The GPU baselines are obtained from NVIDIA RTX A100 and its die area is 826mm2. In `Chain` benchmark, GPU and GenDP throughputs are penalized by 3.72x because they use re-ordered chain algorithm and compute 3.72x more cells than CPU. The CPU baselines and GenDP throughputs are normalized to 7nm to make a fair comparison with GPU baselines. GenDP achieves 157.8x throughput/mm2 speedup over GPU.
 
-| | BSW | CHain | PairHMM | POA |
-| --- | --- | --- | --- | --- |
-| Total Cell Updates | 2431855834 | 20736142007 | 258363282803 | 6448581509 |
-| CPU Runtime (second) | 0.0504 | 0.306 | 0.587 | 16.6 |
-| CPU GCUPS | 44.91 | 19.61 | 32.88 | 14.51 |
-| CPU Normalized MCUPS/mm2 | 130.29 | 56.89 | 95.41 | 42.11 |
-| GPU Runtime (second) | 0.012 | 0.155 | 0.597 | 2.53 |
-| GPU GCUPS | 192.92 | 12.89 | 32.35 | 95.13 | 
-| GPU MCUPS/mm2 | 239.16 | 12.89 | 40.11 | 117.94 |
-| GenDP Normalized MCUPS/mm2 | 47574 | 3626 | 17681 | 2965 |
-| GenDP Speepup over CPU | 365.1x | 63.7x | 185.3x | 70.4x |
-| GenDP Speepup over GPU | 198.9x | 281.4x | 440.8x | 25.1x |
+|                             | BSW         | CHain       | PairHMM       | POA           |
+| --------------------------- | ----------- | ----------- | ------------- | ------------- |
+| Total Cell Updates          | 2431855834  | 20736142007 | 258363282803  | 6448581509    |
+| CPU Runtime (second)        | 0.0504      | 0.306       | 0.587         | 16.6          |
+| CPU GCUPS                   | 44.91       | 19.61       | 32.88         | 14.51         |
+| CPU Normalized MCUPS/mm2    | 130.29      | 56.89       | 95.41         | 42.11         |
+| GPU Runtime (second)        | 0.012       | 0.155       | 0.597         | 2.53          |
+| GPU GCUPS                   | 192.92      | 12.89       | 32.35         | 95.13         | 
+| GPU MCUPS/mm2               | 239.16      | 12.89       | 40.11         | 117.94        |
+| GenDP Normalized MCUPS/mm2  | 47574       | 3626        | 17681         | 2965          |
+| GenDP Speepup over CPU      | 365.1x      | 63.7x       | 185.3x        | 70.4x         |
+| GenDP Speepup over GPU      | 198.9x      | 281.4x      | 440.8x        | 25.1x         |
 
 
 ### Instructions and Scripts
