@@ -44,17 +44,16 @@ The CPU baselines are obtained from Intel(R) Xeon(R) Platinum 8380 CPU @ 2.30GHz
 
 #### Step 1: Check System Requirements
 
-1. Intel CPU with >= 4 cores
-2. Linux OS
-3. gcc >= 8.3.1
-4. cmake >= 3.16.0
-5. OpenMP >= 201511
-6. [icpc](https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#dpcpp-cpp) >= 2021.8.0
-7. ZLIB >= 1.28
-8. NVIDIA GPU and CUDA >= 10.0
-9. Check [GPU compute capability and architecture code](https://developer.nvidia.com/cuda-gpus) 
-10. Python >= 3.7.9
-11. numactl
+1. Linux OS
+2. gcc >= 8.3.1
+3. cmake >= 3.16.0
+4. OpenMP >= 201511
+5. [Intel DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#dpcpp-cpp) >= 2021.8.0
+6. ZLIB >= 1.2.8
+7. NVIDIA GPU and CUDA >= 10.0
+8. Python >= 3.7.9
+9. numactl >= 2.0.0
+10. Check [GPU compute capability and architecture code](https://developer.nvidia.com/cuda-gpus) 
 
 ```bash
 # Install Intel(R) oneAPI DPC++/C++ Compiler (ICX)
