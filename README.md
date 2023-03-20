@@ -101,7 +101,7 @@ python3 $GenDP_WORK_DIR/profile-gpu-baselines-log.py gpu-baselines-log.txt
 
 #### Step 5: Run GenDP Simulator
 
-If there are errors during running, please see scripts in README under `gendp` folder for debugging. The simulation results could be different from the reported above (< 5% error) because the script does not run the entire datasets. The script could also be configured to run the extire datasets by changing parameters but it may takes ~100 hours for simulation. 
+If there are errors during running, please see scripts in README under `gendp` folder for debugging. The simulation results could be different from the reported above (< 5% error) because the script does not run the entire datasets. The script could also be configured to run the extire datasets by changing the input size to -1 and will generate the same throughputs as above, but it may take >100 hours for simulation. 
 
 ```bash
 export GenDP_WORK_DIR=`pwd`
