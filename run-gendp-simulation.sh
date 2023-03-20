@@ -1,6 +1,7 @@
 #!/bin/bash
 set -x
 
+
 INPUT_SIZE_CHAIN=$1
 INPUT_SIZE_PHMM=$2
 INPUT_SIZE_POA=$3
