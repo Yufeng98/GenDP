@@ -2,9 +2,9 @@
 
 ### CPU Baselines
 
-The table below shows the CPU system configuration and the runtime(second) for each kernel.
+The table below shows the CPU system configuration and runtime (in seconds) for each kernel.
 
-| CPU                                          | SIMD Flag | Operatin System       | Threads | BSW    | Chain | PairHMM | POA   |
+| CPU                                          | SIMD Flag | Operating System       | Threads | BSW    | Chain | PairHMM | POA   |
 | -------------------------------------------- | --------- | --------------------- | ------- | -----  | ----- | ------- | ----- |
 | Intel(R) Xeon(R) Platinum 8380 CPU @ 2.30GHz | AVX512    | CentOS Linux 7 (CORE) | 80      | 0.0504 | 0.306 | 0.587   | 16.6  |
 | Intel(R) Xeon(R) Gold 6326 CPU @ 2.90GHz     | AVX512    | Ubuntu 20.04.5 LTS    | 32      | 0.0984 | 0.473 | 0.678   | 34.3  |
@@ -14,7 +14,7 @@ The table below shows the CPU system configuration and the runtime(second) for e
 
 ### GPU Baselines
 
-The table below shows the GPU system configuration and the runtime(second) for each kernel.
+The table below shows the GPU system configuration and runtime (in seconds) for each kernel.
 
 | GPU                | Arch Code | CUDA Version | BSW   | Chain | PairHMM | POA  |
 | ------------------ | --------- | ---- | ----- | ----- | ------  | ---- |
@@ -24,20 +24,20 @@ The table below shows the GPU system configuration and the runtime(second) for e
 
 ### GenDP Speedup Over CPU/GPU
 
-The CPU baselines are obtained from Intel(R) Xeon(R) Platinum 8380 CPU @ 2.30GHz with 80 threads in 1 socket and AVX512. THe CPU die area is 600mm2. The GPU baselines are obtained from NVIDIA RTX A100 and its die area is 826mm2. In `Chain` benchmark, GPU and GenDP throughputs are penalized by 3.72x because they use re-ordered chain algorithm and compute 3.72x more cells than CPU. The CPU baselines and GenDP throughputs are normalized to 7nm to make a fair comparison with GPU baselines. GenDP achieves 157.8x throughput/mm2 speedup over GPU.
+The CPU baselines are obtained from the Intel Xeon Platinum 8380 CPU @ 2.30GHz with 80 threads in 1 socket and AVX512. The CPU die area is 600mm<sup>2</sup>. The GPU baselines are obtained from the NVIDIA RTX A100 and its die area is 826mm<sup>2</sup>. In the `Chain` benchmark, GPU and GenDP throughputs are penalized by 3.72x because they use a re-ordered chaining algorithm and compute 3.72x more cells than the CPU implementation. The CPU baselines and GenDP throughputs are normalized to 7nm technology for a fair comparison with GPU baselines. GenDP achieves an average 157.8x throughput/mm<sup>2</sup> speedup over GPU.
 
 |                             | BSW         | Chain       | PairHMM       | POA           |
 | --------------------------- | ----------- | ----------- | ------------- | ------------- |
 | Total Cell Updates          | 2431855834  | 20736142007 | 258363282803  | 6448581509    |
-| CPU Runtime (second)        | 0.0504      | 0.306       | 0.587         | 16.6          |
+| CPU Runtime (seconds)       | 0.0504      | 0.306       | 0.587         | 16.6          |
 | CPU GCUPS                   | 44.91       | 19.61       | 32.88         | 14.51         |
-| CPU Normalized MCUPS/mm2    | 130.29      | 56.89       | 95.41         | 42.11         |
-| GPU Runtime (second)        | 0.012       | 0.155       | 0.597         | 2.53          |
+| CPU Normalized MCUPS/mm<sup>2</sup>    | 130.29      | 56.89       | 95.41         | 42.11         |
+| GPU Runtime (seconds)       | 0.012       | 0.155       | 0.597         | 2.53          |
 | GPU GCUPS                   | 192.92      | 12.89       | 32.35         | 95.13         | 
-| GPU MCUPS/mm2               | 239.16      | 12.89       | 40.11         | 117.94        |
-| GenDP Normalized MCUPS/mm2  | 47574       | 3626        | 17681         | 2965          |
-| GenDP Speepup over CPU      | 365.1x      | 63.7x       | 185.3x        | 70.4x         |
-| GenDP Speepup over GPU      | 198.9x      | 281.4x      | 440.8x        | 25.1x         |
+| GPU MCUPS/mm<sup>2</sup>    | 239.16      | 12.89       | 40.11         | 117.94        |
+| GenDP Normalized MCUPS/mm<sup>2</sup>  | 47574       | 3626        | 17681         | 2965          |
+| GenDP Speedup over CPU      | 365.1x      | 63.7x       | 185.3x        | 70.4x         |
+| GenDP Speedup over GPU      | 198.9x      | 281.4x      | 440.8x        | 25.1x         |
 
 
 ### Instructions and Scripts
@@ -61,7 +61,7 @@ wget https://registrationcenter-download.intel.com/akdlm/irc_nas/19123/l_dpcpp-c
 sudo sh ./l_dpcpp-cpp-compiler_p_2023.0.0.25393_offline.sh
 # Activate OneAPI Toolkit
 source /opt/intel/oneapi/setvars.sh
-
+# Clone GenDP
 git clone --recursive https://github.com/Yufeng98/GenDP.git
 cd GenDP
 ```
@@ -75,7 +75,7 @@ tar -zxvf gendp-datasets.tar.gz
 
 #### Step 3: Run CPU Baselines
 
-If there are errors during running, please see scripts in README under `cpu-baselines` folder for debugging.
+If you encounter errors while running, please see the scripts in <a href="https://github.com/Yufeng98/GenDP/blob/main/cpu-baselines/README.md">`cpu-baselines/README.md`</a> for debugging.
 
 ```bash
 # Download datasets
@@ -89,11 +89,11 @@ python3 $GenDP_WORK_DIR/profile-cpu-baselines-log.py cpu-baselines-log.txt
 
 #### Step 4: Run GPU Baselines
 
-If there are errors during running, please see scripts in README under `gpu-baselines` folder for debugging.
+If you encounter errors while running, please see the scripts in <a href="https://github.com/Yufeng98/GenDP/blob/main/gpu-baselines/README.md">`gpu-baselines/README.md`</a> for debugging.
 
 ```bash
 export GenDP_WORK_DIR=`pwd`
-# The path of CUDA library is usually /usr/local/cuda-xx
+# The CUDA library path is usually /usr/local/cuda-xx
 # See Step 1.7 for how to look for ARCH_CODE
 bash run-gpu-baselines.sh <CUDA_PATH> <CUDA_BINARY_PATH> <ARCH_CODE> > gpu-baselines-log.txt 2>&1
 python3 $GenDP_WORK_DIR/profile-gpu-baselines-log.py gpu-baselines-log.txt
@@ -101,7 +101,7 @@ python3 $GenDP_WORK_DIR/profile-gpu-baselines-log.py gpu-baselines-log.txt
 
 #### Step 5: Run GenDP Simulator
 
-If there are errors during running, please see scripts in README under `gendp` folder for debugging. The simulation results could be different from the reported above (< 5% error) because the script does not run the entire datasets. The script could also be configured to run the extire datasets by changing the input size to -1 and will generate the same throughputs as above, but it may take >100 hours for simulation. 
+If you encounter errors while running, please see the scripts in <a href="https://github.com/Yufeng98/GenDP/blob/main/gendp/README.md">`gendp/README.md`</a> for debugging. The simulation results could be different from those reported above (< 5% error) because the script does not run the entire datasets. The script could also be configured to run the entire datasets by changing the input size to -1 and will generate the same throughputs as above, but it may take >100 hours for simulation. 
 
 ```bash
 export GenDP_WORK_DIR=`pwd`
