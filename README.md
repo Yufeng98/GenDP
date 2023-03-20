@@ -44,16 +44,16 @@ The CPU baselines are obtained from the Intel Xeon Platinum 8380 CPU @ 2.30GHz w
 
 #### Step 1: Check System Requirements
 
-1. Linux OS
-2. gcc >= 8.3.1
-3. cmake >= 3.16.0
-4. OpenMP >= 201511
-5. [Intel DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#dpcpp-cpp) >= 2021.8.0
-6. ZLIB >= 1.2.8
-7. NVIDIA GPU and CUDA >= 10.0
-8. Python >= 3.7.9
-9. numactl >= 2.0.0
-10. Check [GPU compute capability and architecture code](https://developer.nvidia.com/cuda-gpus) 
+1. Intel CPU with 16G memory and 40G storage 
+2. Linux OS
+3. NVIDIA GPU and CUDA >= 10.0
+4. gcc >= 8.3.1
+5. cmake >= 3.16.0
+6. OpenMP >= 201511
+7. [Intel DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#dpcpp-cpp) >= 2021.8.0
+8. ZLIB >= 1.2.8 
+9. Python >= 3.7.9
+10. numactl >= 2.0.0
 
 ```bash
 # Install Intel(R) oneAPI DPC++/C++ Compiler (ICX)
@@ -61,14 +61,15 @@ wget https://registrationcenter-download.intel.com/akdlm/irc_nas/19123/l_dpcpp-c
 sudo sh ./l_dpcpp-cpp-compiler_p_2023.0.0.25393_offline.sh
 # Activate OneAPI Toolkit
 source /opt/intel/oneapi/setvars.sh
+```
+
+#### Step 2: Download Repository and Datasets
+
+```bash
 # Clone GenDP
 git clone --recursive https://github.com/Yufeng98/GenDP.git
 cd GenDP
-```
-
-#### Step 2: Download Datasets
-
-```bash
+# Download Datasets
 wget https://genomicsbench.eecs.umich.edu/gendp-datasets.tar.gz
 tar -zxvf gendp-datasets.tar.gz
 ```
@@ -83,7 +84,7 @@ export GenDP_WORK_DIR=`pwd`
 # Specify the SIMD flag and number of threads to use.
 # Check SIMD compatibility with `lscpu | grep Flags`, e.g., sse, avx2, avx512
 # Use sse4.1 as the default SIMD flag, could also choose avx2 or avx512
-bash run-cpu-baselines.sh <SIMD_FLAG> <NUM_THREADS> > cpu-baselines-log.txt 2>&1
+bash run-cpu-baselines.sh <SIMD_FLAG> <NUM_THREADS> 2>&1 | tee cpu-baselines-log.txt
 python3 $GenDP_WORK_DIR/profile-cpu-baselines-log.py cpu-baselines-log.txt
 ```
 
@@ -93,9 +94,11 @@ If you encounter errors while running, please see the scripts in <a href="https:
 
 ```bash
 export GenDP_WORK_DIR=`pwd`
-# The CUDA library path is usually /usr/local/cuda-xx
-# See Step 1.7 for how to look for ARCH_CODE
-bash run-gpu-baselines.sh <CUDA_PATH> <CUDA_BINARY_PATH> <ARCH_CODE> > gpu-baselines-log.txt 2>&1
+# The path of CUDA library <CUDA_PATH> is usually /usr/local/cuda-xx
+# The path of CUDA binary library <CUDA_BINARY_PATH> is usually /usr/local/cuda-xx/bin
+# The <ARCH_CODE> could be found by checking the compute capability of the GPU from https://developer.nvidia.com/cuda-gpus
+# E.g. if the Compute Capability of NVIDIA A100 is 8.0, its ARCH_CODE is sm_80
+bash run-gpu-baselines.sh <CUDA_PATH> <CUDA_BINARY_PATH> <ARCH_CODE> 2>&1 | tee gpu-baselines-log.txt
 python3 $GenDP_WORK_DIR/profile-gpu-baselines-log.py gpu-baselines-log.txt
 ```
 
@@ -105,6 +108,11 @@ If you encounter errors while running, please see the scripts in <a href="https:
 
 ```bash
 export GenDP_WORK_DIR=`pwd`
-bash run-gendp-simulation.sh > gendp-simulation-log.txt 2>&1
+# bash run-gendp-simulation.sh <Chain input size> <PairHMM input size> <POA input size>
+# See approximate runtime on different input sizes for each kernel in script run-gendp-simulation.sh
+# BSW simulation is fast and entire dataset is default.
+bash run-gendp-simulation.sh 500 100000 100 2>&1 | tee gendp-simulation-log.txt      # ~ 6 hours
+bash run-gendp-simulation.sh 1000 500000 200 2>&1 | tee gendp-simulation-log.txt     # ~ 24 hours
+bash run-gendp-simulation.sh -1 -1 -1 2>&1 | tee gendp-simulation-log.txt           # > 100 hours for entire dataset
 python3 $GenDP_WORK_DIR/profile-gendp-simulation-log.py gendp-simulation-log.txt
 ```

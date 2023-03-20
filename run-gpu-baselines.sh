@@ -2,9 +2,9 @@
 set -x
 
 # preparation
-export CUDA_PATH=$1
-export CUDA_BINARY_PATH=$2
-export ARCH_CODE=$3
+CUDA_PATH=$1
+CUDA_BINARY_PATH=$2
+ARCH_CODE=$3
 
 ### BSW
 cd $GenDP_WORK_DIR/gpu-baselines/bsw/GASAL2

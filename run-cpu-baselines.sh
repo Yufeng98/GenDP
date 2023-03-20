@@ -2,8 +2,8 @@
 set -x
 
 # preparation
-export SIMD_FLAG=$1
-export NUM_THREADS=$2
+SIMD_FLAG=$1
+NUM_THREADS=$2
 
 # BSW
 # Use sse4.1 as the default SIMD flag, could also choose avx2 or avx512
