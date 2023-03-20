@@ -13,6 +13,9 @@ filename_kernel = sys.argv[2]
 total_consensus = int(sys.argv[3])
 num_threads = int(sys.argv[4])
 
+if total_consensus < 0:
+    total_consensus = 6216
+
 f = open(filename_simulation, "w")
 f.write("#!/bin/bash\n\n")
 f.write("python3 scripts/poa_instruction_generator.py\n")
