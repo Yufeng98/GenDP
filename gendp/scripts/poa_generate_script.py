@@ -74,7 +74,7 @@ f.write("num_threads={}\n\n".format(num_threads))
 
 f.write("for i in {0.." + str(total_consensus//num_threads-1) + "}\ndo\n")
 for i in range(num_threads):
-    f.write("  ./poa -datasets_path ../../../gendp-datasets -read_fasta ../../../gendp-datasets/poa/poa_$((i*num_threads+" + str(i+1) + ")) -clustal clustal-180.out -hb blosum80_small.mat &\n")
+    f.write("  ./poa -datasets_path ../../../gendp-datasets -read_fasta ../../../gendp-datasets/poa/poa_$((i*num_threads+" + str(i+1) + ")) -clustal tmp -hb blosum80_small.mat &\n")
     f.write("  P{}=$!\n".format(i+1))
 f.write("  wait")
 for i in range(num_threads):
@@ -82,7 +82,7 @@ for i in range(num_threads):
 f.write("\ndone\n\n")
 
 for i in range(total_consensus%num_threads):
-    f.write("./poa -datasets_path ../../../gendp-datasets -read_fasta ../../../gendp-datasets/poa/poa_" + str(total_consensus//num_threads * num_threads + i + 1) + " -clustal clustal-180.out -hb blosum80_small.mat &\n")
+    f.write("./poa -datasets_path ../../../gendp-datasets -read_fasta ../../../gendp-datasets/poa/poa_" + str(total_consensus//num_threads * num_threads + i + 1) + " -clustal tmp -hb blosum80_small.mat &\n")
     f.write("  P{}=$!\n".format(i+1))
 if total_consensus%num_threads > 0:
     f.write("wait")
