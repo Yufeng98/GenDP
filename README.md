@@ -80,7 +80,7 @@ tar -zxvf gendp-datasets.tar.gz
 If you encounter errors while running, please see the scripts in <a href="https://github.com/Yufeng98/GenDP/blob/main/cpu-baselines/README.md">`cpu-baselines/README.md`</a> for debugging.
 
 ```bash
-# Download datasets
+# Specify workspace directory
 export GenDP_WORK_DIR=`pwd`
 # Specify the SIMD flag and number of threads to use.
 # Check SIMD compatibility with `lscpu | grep Flags`, e.g., sse, avx2, avx512
