@@ -18,7 +18,7 @@ The table below shows the GPU system configuration and runtime (in seconds) for 
 
 | GPU                | Arch Code | CUDA Version | BSW   | Chain | PairHMM | POA  |
 | ------------------ | --------- | ---- | ----- | ----- | ------  | ---- |
-| NVIDIA RTX A100    | sm_80     | 11.2 | 0.012 | 0.155 | 0.597   | 2.53 |
+| NVIDIA A100        | sm_80     | 11.2 | 0.012 | 0.155 | 0.597   | 2.53 |
 | NVIDIA RTX A6000   | sm_86     | 12.0 | 0.012 | 0.339 | 0.572   | 3.70 |
 | NVIDIA TITAN Xp    | sm_61     | 10.2 | 0.020 | 0.747 | 0.915   | 11.2 |
 
