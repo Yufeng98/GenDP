@@ -7,7 +7,7 @@ The table below shows the CPU system configuration and runtime (in seconds) for 
 | CPU                                          | SIMD Flag | Operating System       | Threads | BSW    | Chain | PairHMM | POA   |
 | -------------------------------------------- | --------- | --------------------- | ------- | -----  | ----- | ------- | ----- |
 | Intel(R) Xeon(R) Platinum 8380 CPU @ 2.30GHz | AVX512    | CentOS Linux 7 (CORE) | 80      | 0.0504 | 0.306 | 0.587   | 16.6  |
-| Intel(R) Xeon(R) Gold 6326 CPU @ 2.90GHz     | AVX512    | Ubuntu 20.04.5 LTS    | 32      | 0.0984 | 0.473 | 0.678   | 34.3  |
+| Intel(R) Xeon(R) Gold 6326 CPU @ 2.90GHz     | AVX512    | Ubuntu 20.04.5 LTS    | 32      | 0.0984 | 0.473 | 0.792   | 34.3  |
 | Intel(R) Xeon(R) CPU E5-2697 v3 @ 2.60GHz    | AVX2      | CentOS Linux 7 (CORE) | 28      | 0.196  | 2.35  | 2.13    | 41.7  |
 | 12th Gen Intel(R) Core(TM) i5-12600          | AVX2      | Ubuntu 22.04.2 LTS    | 12      | 0.140  | 2.21  | 1.71    | 36.6  |
 | Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz      | AVX2      | Ubuntu 20.04.5 LTS    | 8       | 0.29   | 4.79  | 4.51    | 98.5  |
