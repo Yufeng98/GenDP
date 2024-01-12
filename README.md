@@ -118,6 +118,20 @@ bash run-gendp-simulation.sh -1 -1 -1 2>&1 | tee gendp-simulation-log.txt       
 python3 $GenDP_WORK_DIR/profile-gendp-simulation-log.py gendp-simulation-log.txt
 ```
 
-### Issues and bug reporting
+### Issues and Acknowledgment
 
 We appreciate any feedback and suggestions from the community. Feel free to raise an issue or submit a pull request on Github. For assistance in using GenDP, please contact: Yufeng Gu (yufenggu AT umich DOT edu).
+
+If you decide to use GenDP in your research, please cite the following references:
+
+> Gu, Y., Subramaniyan, A., Dunn, T., Khadem, A., Chen, K.Y., Paul, S., Vasimuddin, M., Misra, S., Blaauw, D., Narayanasamy, S. and Das, R., 2023, June. GenDP: A Framework of Dynamic Programming Acceleration for Genome Sequencing Analysis. In Proceedings of the 50th Annual International Symposium on Computer Architecture (pp. 1-15).
+
+```
+@inproceedings{gu2023gendp,
+  title={GenDP: A Framework of Dynamic Programming Acceleration for Genome Sequencing Analysis},
+  author={Gu, Yufeng and Subramaniyan, Arun and Dunn, Tim and Khadem, Alireza and Chen, Kuan-Yu and Paul, Somnath and Vasimuddin, Md and Misra, Sanchit and Blaauw, David and Narayanasamy, Satish and others},
+  booktitle={Proceedings of the 50th Annual International Symposium on Computer Architecture},
+  pages={1--15},
+  year={2023}
+}
+``` 
